@@ -4,7 +4,7 @@ import { toPng } from "html-to-image";
 import {
   Smartphone, Tablet, Monitor, Grid3X3, Download, Activity,
   ZoomIn, ZoomOut, Maximize2, FileImage, Move, MousePointer2,
-  Crosshair, Ruler,
+  Crosshair, Ruler, Eye, EyeOff, CopyPlus, Trash2, Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GlowState } from "@/lib/glow-types";
@@ -227,7 +227,7 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
                       className={cn(
                         "absolute top-1/2 left-1/2 rounded-full cursor-move transition-shadow duration-200",
                         state.selectedLayerId === layer.id
-                          ? "ring-2 ring-primary/50 z-50"
+                          ? "ring-2 ring-primary/50 z-50 shadow-[0_0_20px_rgba(var(--primary),0.3)]"
                           : hoveredLayer === layer.id
                             ? "ring-1 ring-foreground/15"
                             : ""
@@ -243,6 +243,31 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
                         zIndex: index,
                       }}
                     >
+                      {/* Floating Layer Context Toolbar */}
+                      {state.selectedLayerId === layer.id && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          className="absolute -top-16 left-1/2 -translate-x-1/2 flex items-center gap-1.5 p-1.5 bg-black/80 border border-white/10 backdrop-blur-2xl rounded-2xl shadow-2xl z-[1000] pointer-events-auto"
+                        >
+                          <ToolBtn onClick={(e) => { e?.stopPropagation(); onStateChange({ ...state, layers: state.layers.map(l => l.id === layer.id ? { ...l, active: !l.active } : l) }); }} className="p-1.5 rounded-lg">
+                            {layer.active ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                          </ToolBtn>
+                          <div className="w-px h-4 bg-white/10" />
+                          <ToolBtn onClick={(e) => { e?.stopPropagation(); const nl = { ...layer, id: `layer-${Date.now()}`, name: `${layer.name} Copy`, x: layer.x + 20, y: layer.y + 20 }; onStateChange({ ...state, layers: [...state.layers, nl], selectedLayerId: nl.id }); toast.success("Layer duplicated"); }} className="p-1.5 rounded-lg">
+                            <CopyPlus className="w-3.5 h-3.5" />
+                          </ToolBtn>
+                          <ToolBtn onClick={(e) => { e?.stopPropagation(); if (state.layers.length > 1) { const nl = state.layers.filter(l => l.id !== layer.id); onStateChange({ ...state, layers: nl, selectedLayerId: nl[0].id }); toast.success("Layer removed"); } }} className="p-1.5 rounded-lg hover:text-destructive">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </ToolBtn>
+                          <div className="w-px h-4 bg-white/10" />
+                          <div className="flex items-center gap-1 px-2 py-1 bg-white/5 rounded-lg border border-white/5">
+                            <Sparkles className="w-3 h-3 text-primary/60" />
+                            <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest whitespace-nowrap">Selected</span>
+                          </div>
+                        </motion.div>
+                      )}
+
                       {/* Layer info tooltip */}
                       {(showDimensions && state.selectedLayerId === layer.id) && (
                         <motion.div

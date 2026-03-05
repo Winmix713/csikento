@@ -46,6 +46,9 @@ function LayerManager({ layers, selectedId, onSelect, onUpdate, onAdd, onRemove,
   layers: GlowLayer[]; selectedId: string | null; onSelect: (id: string) => void;
   onUpdate: (layers: GlowLayer[]) => void; onAdd: () => void; onRemove: (id: string) => void; onDuplicate: (id: string) => void;
 }) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+
   const toggleVis = (id: string, e: React.MouseEvent) => { e.stopPropagation(); onUpdate(layers.map((l) => l.id === id ? { ...l, active: !l.active } : l)); };
   const moveLayer = (id: string, dir: "up" | "down", e: React.MouseEvent) => {
     e.stopPropagation();
@@ -53,6 +56,19 @@ function LayerManager({ layers, selectedId, onSelect, onUpdate, onAdd, onRemove,
     const nIdx = dir === "up" ? idx + 1 : idx - 1;
     if (nIdx < 0 || nIdx >= layers.length) return;
     const nl = [...layers]; [nl[idx], nl[nIdx]] = [nl[nIdx], nl[idx]]; onUpdate(nl);
+  };
+
+  const startEditing = (id: string, name: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingId(id);
+    setEditName(name);
+  };
+
+  const saveName = (id: string) => {
+    if (editName.trim()) {
+      onUpdate(layers.map(l => l.id === id ? { ...l, name: editName.trim() } : l));
+    }
+    setEditingId(null);
   };
 
   return (
@@ -94,7 +110,26 @@ function LayerManager({ layers, selectedId, onSelect, onUpdate, onAdd, onRemove,
                   {layer.active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
                 </button>
                 <motion.div className="w-3 h-3 rounded-full flex-shrink-0 ring-1 ring-editor-border" style={{ backgroundColor: layer.color }} layoutId={`lc-${layer.id}`} />
-                <span className="flex-1 text-[11px] font-medium truncate">{layer.name}</span>
+
+                {editingId === layer.id ? (
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onBlur={() => saveName(layer.id)}
+                    onKeyDown={(e) => e.key === "Enter" && saveName(layer.id)}
+                    className="flex-1 bg-black/40 border-none outline-none text-[11px] font-bold text-white px-1 rounded"
+                    autoFocus
+                  />
+                ) : (
+                  <span
+                    className="flex-1 text-[11px] font-medium truncate"
+                    onDoubleClick={(e) => startEditing(layer.id, layer.name, e)}
+                  >
+                    {layer.name}
+                  </span>
+                )}
+
                 <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={(e) => { e.stopPropagation(); onDuplicate(layer.id); }} className="p-0.5 rounded hover:text-primary transition-colors"><CopyPlus className="w-2.5 h-2.5" /></button>
                   <button onClick={(e) => { e.stopPropagation(); onRemove(layer.id); }} className="p-0.5 rounded hover:text-destructive transition-colors"><Trash2 className="w-2.5 h-2.5" /></button>

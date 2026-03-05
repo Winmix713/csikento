@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Settings2, Code, Palette, RefreshCcw, Copy, Check,
-  FileText, FileCode2,
+  FileText, FileCode2, Sparkles, Wand2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
@@ -238,6 +238,36 @@ export function RightSidebar({ state, onStateChange, cssOverride, setCssOverride
             {activeTab === "style" ? (
               selectedLayer ? (
                 <>
+                  {/* Smart Suggestions Bento */}
+                  <div className="bg-primary/5 rounded-2xl p-4 border border-primary/20 space-y-3 relative overflow-hidden group/suggestions">
+                    <div className="absolute inset-0 bg-primary/5 blur-xl opacity-0 group-hover/suggestions:opacity-100 transition-opacity pointer-events-none" />
+                    <div className="flex items-center gap-2 relative z-10">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      <span className="text-[10px] font-bold text-white uppercase tracking-widest">Smart Suggestions</span>
+                    </div>
+                    <div className="flex gap-2 relative z-10">
+                      <button
+                        onClick={() => updateLayer({ blur: Math.min(300, selectedLayer.blur + 50), width: Math.min(800, selectedLayer.width + 100), height: Math.min(800, selectedLayer.height + 100) })}
+                        className="flex-1 py-2 px-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-[10px] font-bold text-white transition-all flex items-center justify-center gap-2"
+                      >
+                        <Wand2 className="w-3 h-3 text-primary/60" /> Boost Glow
+                      </button>
+                      <button
+                        onClick={() => {
+                          const otherLayers = state.layers.filter(l => l.id !== selectedLayer.id);
+                          if (otherLayers.length > 0) {
+                            const avgColor = otherLayers[0].color; // Simplified harmonize
+                            updateLayer({ color: avgColor });
+                            toast.success("Color harmonized with group");
+                          }
+                        }}
+                        className="flex-1 py-2 px-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl text-[10px] font-bold text-white transition-all flex items-center justify-center gap-2"
+                      >
+                        <RefreshCcw className="w-3 h-3 text-primary/60" /> Harmonize
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Layer Info Bento */}
                   <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/5 space-y-4">
                     <div className="flex items-center gap-3">
