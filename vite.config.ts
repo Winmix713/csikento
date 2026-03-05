@@ -18,4 +18,13 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Web Worker configuration
+  worker: {
+    format: "es",
+    plugins: () => [react()],
+  },
+  // Optimize dependencies for worker imports
+  optimizeDeps: {
+    exclude: ["@/workers/export.worker"],
+  },
 }));

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import type { GlowState, GlowLayer } from "@/lib/glow-types";
 import { BUILT_IN_PRESETS, PRESET_CATEGORIES } from "@/lib/glow-presets";
 import { duplicateLayer, generateRandomGlow } from "@/lib/glow-utils";
+import { COMPONENT_TYPES, type ComponentTypeId } from "@/config/components.tsx";
 
 // ── Design tokens — GLOW palette (matches HTML reference) ─────────────────────
 const GLOW = {
@@ -593,25 +594,16 @@ export function LeftSidebar({
           Component
         </div>
         <div className="grid grid-cols-4 gap-1.5" role="radiogroup" aria-label="Component type">
-          {[
-            { value: "button", label: "Button", icon: <><rect x="3" y="8" width="18" height="8" rx="4" /><line x1="8" y1="12" x2="16" y2="12" /></> },
-            { value: "card", label: "Card", icon: <><rect x="3" y="4" width="18" height="16" rx="3" /><line x1="3" y1="9" x2="21" y2="9" /></> },
-            { value: "header", label: "Header", icon: <><rect x="2" y="3" width="20" height="5" rx="2" /><line x1="5" y1="5.5" x2="10" y2="5.5" /><circle cx="18" cy="5.5" r="1.2" fill="currentColor" stroke="none" /><circle cx="14.5" cy="5.5" r="1.2" fill="currentColor" stroke="none" /></> },
-            { value: "hero", label: "Hero", icon: <><rect x="2" y="3" width="20" height="13" rx="2" /><line x1="7" y1="8" x2="17" y2="8" /><line x1="9" y1="11" x2="15" y2="11" /><rect x="8" y="19" width="8" height="3" rx="1.5" /></> },
-            { value: "input", label: "Input", icon: <><rect x="3" y="8" width="18" height="8" rx="2" /><line x1="7" y1="12" x2="7.01" y2="12" strokeWidth={2.2} /></> },
-            { value: "modal", label: "Modal", icon: <><rect x="4" y="5" width="16" height="14" rx="2" /><line x1="4" y1="9" x2="20" y2="9" /><line x1="17" y1="7" x2="17.01" y2="7" strokeWidth={2} /><line x1="14.5" y1="7" x2="14.51" y2="7" strokeWidth={2} /></> },
-            { value: "nav", label: "Nav", icon: <><line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="14" y2="17" /></> },
-            { value: "badge", label: "Badge", icon: <><rect x="5" y="9" width="14" height="6" rx="3" /><line x1="9" y1="12" x2="15" y2="12" strokeWidth={1.3} /></> },
-          ].map(({ value, label, icon }) => {
-            const isSelected = (state as any).componentType === value;
+          {COMPONENT_TYPES.map(({ id, label, icon }) => {
+            const isSelected = (state as unknown as { componentType: ComponentTypeId }).componentType === id;
             return (
-              <label key={value} style={{ position: "relative" }}>
+              <label key={id} style={{ position: "relative" }}>
                 <input
                   type="radio"
                   name="glowComponent"
-                  value={value}
+                  value={id}
                   checked={isSelected}
-                  onChange={() => updateState({ componentType: value } as any)}
+                  onChange={() => updateState({ componentType: id } as Partial<GlowState>)}
                   className="absolute opacity-0 w-0 h-0 pointer-events-none"
                 />
                 <motion.span
