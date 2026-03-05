@@ -210,17 +210,17 @@ export function RightSidebar({ state, onStateChange, cssOverride, setCssOverride
   ];
 
   return (
-    <div className="w-[280px] flex-shrink-0 glass-surface rounded-2xl flex flex-col max-h-[calc(100vh-5rem)] overflow-hidden">
+    <div className="w-[320px] flex-shrink-0 glass-surface rounded-3xl flex flex-col max-h-[calc(100vh-1.5rem)] overflow-hidden m-1.5 border-white/5 shadow-2xl">
       {/* Tab bar */}
-      <div className="p-3 pb-0">
-        <div className="flex bg-editor-surface rounded-xl p-0.5 gap-0.5 border border-editor-border/50 relative">
+      <div className="p-4 pb-0 bg-white/[0.02]">
+        <div className="flex bg-black/20 rounded-2xl p-1 gap-1 border border-white/5 relative">
           {tabs.map(({ id, label, icon: Icon }) => (
             <button key={id} onClick={() => setActiveTab(id)}
-              className={cn("flex-1 py-1.5 text-[10px] font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 relative z-10",
-                activeTab === id ? "text-foreground" : "text-editor-text-dim hover:text-muted-foreground")}>
-              <Icon className="w-3 h-3" /> {label}
+              className={cn("flex-1 py-2 text-[11px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 relative z-10",
+                activeTab === id ? "text-white" : "text-white/40 hover:text-white/70")}>
+              <Icon className="w-3.5 h-3.5" /> {label}
               {activeTab === id && (
-                <motion.div layoutId="right-tab-bg" className="absolute inset-0 bg-secondary rounded-lg shadow-sm -z-10"
+                <motion.div layoutId="right-tab-bg" className="absolute inset-0 bg-white/[0.05] border border-white/10 rounded-xl shadow-lg -z-10"
                   transition={{ type: "spring", stiffness: 500, damping: 35 }} />
               )}
             </button>
@@ -229,97 +229,121 @@ export function RightSidebar({ state, onStateChange, cssOverride, setCssOverride
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 pt-3">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-5 pt-4">
         <AnimatePresence mode="wait">
           <motion.div key={activeTab}
-            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.15 }} className="space-y-4">
+            initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }} className="space-y-6">
 
             {activeTab === "style" ? (
               selectedLayer ? (
                 <>
-                  {/* Color picker */}
-                  <div className="flex items-center gap-2">
-                    <div className="relative">
-                      <motion.div className="w-9 h-9 rounded-xl border-2 border-editor-border cursor-pointer shadow-lg"
-                        style={{ backgroundColor: selectedLayer.color }}
-                        whileHover={{ scale: 1.08 }} transition={{ type: "spring", stiffness: 400, damping: 20 }} />
-                      <input type="color" value={selectedLayer.color} onChange={(e) => updateLayer({ color: e.target.value })} className="w-9 h-9 opacity-0 absolute inset-0 cursor-pointer" />
+                  {/* Layer Info Bento */}
+                  <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/5 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="relative group">
+                        <motion.div className="w-12 h-12 rounded-2xl border-2 border-white/10 cursor-pointer shadow-xl group-hover:scale-105 transition-transform overflow-hidden"
+                          style={{ backgroundColor: selectedLayer.color }} />
+                        <input type="color" value={selectedLayer.color} onChange={(e) => updateLayer({ color: e.target.value })} className="w-12 h-12 opacity-0 absolute inset-0 cursor-pointer" />
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Active Layer</span>
+                        <input type="text" value={selectedLayer.color} onChange={(e) => updateLayer({ color: e.target.value })}
+                          className="bg-transparent border-none w-full text-sm font-bold text-white outline-none focus:text-primary transition-colors" />
+                      </div>
                     </div>
-                    <input type="text" value={selectedLayer.color} onChange={(e) => updateLayer({ color: e.target.value })}
-                      className="bg-transparent border-b border-editor-border w-full text-[11px] py-1 outline-none font-mono text-foreground focus:border-primary/50 transition-colors" />
+
+                    <ColorSwatchRow currentColor={selectedLayer.color} onSelect={(c) => updateLayer({ color: c })} />
                   </div>
 
-                  {/* Quick swatches */}
-                  <ColorSwatchRow currentColor={selectedLayer.color} onSelect={(c) => updateLayer({ color: c })} />
+                  {/* Harmony Bento */}
+                  <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/5">
+                    <ColorHarmonyPanel currentColor={selectedLayer.color} onSelect={(c) => updateLayer({ color: c })} />
+                  </div>
 
-                  {/* Color harmonies */}
-                  <ColorHarmonyPanel currentColor={selectedLayer.color} onSelect={(c) => updateLayer({ color: c })} />
-
-                  {/* Sliders */}
-                  <div className="space-y-3 pt-2 border-t border-glass-border/30">
+                  {/* Sliders Bento */}
+                  <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/5 space-y-5">
                     {([
                       { label: "Blur", key: "blur" as const, max: 300, step: 1, unit: "px" },
                       { label: "Opacity", key: "opacity" as const, max: 1, step: 0.01, unit: "" },
                       { label: "Width", key: "width" as const, max: 800, step: 10, unit: "px" },
                       { label: "Height", key: "height" as const, max: 800, step: 10, unit: "px" },
                     ] as const).map(({ label, key, max, step, unit }) => (
-                      <div key={key} className="space-y-1">
+                      <div key={key} className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <span className="prop-label">{label}</span>
+                          <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider">{label}</span>
                           <NumberInput value={selectedLayer[key]} onChange={(v) => updateLayer({ [key]: v })} min={0} max={max} step={step} unit={unit} />
                         </div>
-                        <AnimatedSlider value={[selectedLayer[key]]} onValueChange={(v) => updateLayer({ [key]: v[0] })} max={max} step={step} />
+                        <AnimatedSlider value={[selectedLayer[key]]} onValueChange={(v) => updateLayer({ [key]: v[0] })} max={max} step={step} className="[&_[role=slider]]:h-3 [&_[role=slider]]:w-3" />
                       </div>
                     ))}
                   </div>
 
-                  {/* Blend Mode */}
-                  <div className="space-y-1">
-                    <span className="prop-label">Blend</span>
+                  {/* Blend Mode Bento */}
+                  <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/5 space-y-2">
+                    <span className="text-[10px] font-bold text-white/70 uppercase tracking-wider">Blending</span>
                     <Select value={selectedLayer.blendMode} onValueChange={(v) => updateLayer({ blendMode: v as BlendMode })}>
-                      <SelectTrigger className="h-7 text-[10px] bg-editor-surface border-editor-border rounded-lg font-medium"><SelectValue /></SelectTrigger>
-                      <SelectContent>
+                      <SelectTrigger className="h-10 text-[11px] bg-black/20 border-white/10 rounded-xl font-bold hover:bg-black/30 transition-all"><SelectValue /></SelectTrigger>
+                      <SelectContent className="bg-editor-surface border-white/10 backdrop-blur-xl">
                         {["normal", "screen", "overlay", "soft-light", "color-dodge", "multiply"].map((m) => (
-                          <SelectItem key={m} value={m}>{m}</SelectItem>
+                          <SelectItem key={m} value={m} className="text-[11px] font-bold">{m}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                 </>
               ) : (
-                <p className="text-[10px] text-editor-text-dim text-center py-8">Select a layer to edit</p>
+                <div className="flex flex-col items-center justify-center py-20 opacity-30">
+                  <Palette className="w-12 h-12 mb-4" />
+                  <p className="text-[11px] font-bold uppercase tracking-widest">Select a layer</p>
+                </div>
               )
             ) : activeTab === "global" ? (
               <div className="space-y-4">
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center"><span className="prop-label">Scale</span><NumberInput value={state.globalScale} onChange={(v) => updateState({ globalScale: v })} step={0.1} min={0.5} max={2} /></div>
-                  <AnimatedSlider value={[state.globalScale]} onValueChange={(v) => updateState({ globalScale: v[0] })} min={0.5} max={2.0} step={0.05} />
+                <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/5 space-y-5">
+                   <div className="space-y-2">
+                    <div className="flex justify-between items-center"><span className="text-[10px] font-bold text-white/70 uppercase tracking-wider">Scale</span><NumberInput value={state.globalScale} onChange={(v) => updateState({ globalScale: v })} step={0.1} min={0.5} max={2} /></div>
+                    <AnimatedSlider value={[state.globalScale]} onValueChange={(v) => updateState({ globalScale: v[0] })} min={0.5} max={2.0} step={0.05} />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center"><span className="text-[10px] font-bold text-white/70 uppercase tracking-wider">Opacity</span><NumberInput value={state.globalOpacity} onChange={(v) => updateState({ globalOpacity: v })} step={0.05} max={1} min={0} /></div>
+                    <AnimatedSlider value={[state.globalOpacity]} onValueChange={(v) => updateState({ globalOpacity: v[0] })} max={1} step={0.01} />
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center"><span className="prop-label">Opacity</span><NumberInput value={state.globalOpacity} onChange={(v) => updateState({ globalOpacity: v })} step={0.05} max={1} min={0} /></div>
-                  <AnimatedSlider value={[state.globalOpacity]} onValueChange={(v) => updateState({ globalOpacity: v[0] })} max={1} step={0.01} />
-                </div>
-                <div className="space-y-2 bg-editor-surface rounded-xl p-3 border border-editor-border">
-                  <div className="flex items-center justify-between"><span className="text-[10px] font-semibold text-foreground">Animation</span><Switch checked={state.animation.enabled} onCheckedChange={(v) => updateState({ animation: { ...state.animation, enabled: v } })} /></div>
+
+                <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-white uppercase tracking-widest">Animation</span>
+                      <span className="text-[9px] text-muted-foreground mt-0.5">Dynamic pulsing</span>
+                    </div>
+                    <Switch checked={state.animation.enabled} onCheckedChange={(v) => updateState({ animation: { ...state.animation, enabled: v } })} className="data-[state=checked]:bg-primary" />
+                  </div>
                   <AnimatePresence>
                     {state.animation.enabled && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-                        <div className="space-y-1 pl-2 border-l-2 border-primary/20">
-                          <div className="flex justify-between text-[10px] text-muted-foreground"><span>Duration</span><span className="font-mono">{state.animation.duration}s</span></div>
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                        <div className="space-y-2 pt-2">
+                          <div className="flex justify-between text-[10px] font-bold text-white/50"><span>SPEED</span><span>{state.animation.duration}s</span></div>
                           <AnimatedSlider value={[state.animation.duration]} onValueChange={(v) => updateState({ animation: { ...state.animation, duration: v[0] } })} min={0.5} max={10} step={0.5} />
                         </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
-                <div className="space-y-2 bg-editor-surface rounded-xl p-3 border border-editor-border">
-                  <div className="flex items-center justify-between"><span className="text-[10px] font-semibold text-foreground">Noise Overlay</span><Switch checked={state.noiseEnabled} onCheckedChange={(v) => updateState({ noiseEnabled: v })} /></div>
+
+                <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-white uppercase tracking-widest">Texture</span>
+                      <span className="text-[9px] text-muted-foreground mt-0.5">Organic noise</span>
+                    </div>
+                    <Switch checked={state.noiseEnabled} onCheckedChange={(v) => updateState({ noiseEnabled: v })} className="data-[state=checked]:bg-primary" />
+                  </div>
                   <AnimatePresence>
                     {state.noiseEnabled && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-                        <div className="space-y-1 pl-2 border-l-2 border-primary/20">
-                          <div className="flex justify-between text-[10px] text-muted-foreground"><span>Intensity</span><span className="font-mono">{Math.round(state.noiseIntensity * 100)}%</span></div>
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                        <div className="space-y-2 pt-2">
+                          <div className="flex justify-between text-[10px] font-bold text-white/50"><span>INTENSITY</span><span>{Math.round(state.noiseIntensity * 100)}%</span></div>
                           <AnimatedSlider value={[state.noiseIntensity]} onValueChange={(v) => updateState({ noiseIntensity: v[0] })} max={1} step={0.01} />
                         </div>
                       </motion.div>
@@ -328,21 +352,24 @@ export function RightSidebar({ state, onStateChange, cssOverride, setCssOverride
                 </div>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/5 space-y-4 h-full">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-semibold text-editor-text-muted uppercase tracking-wider">Live CSS</span>
+                  <span className="text-[10px] font-bold text-white uppercase tracking-widest">Live System CSS</span>
                   {cssOverride && (
-                    <button onClick={() => setCssOverride(null)} className="text-[9px] font-medium bg-destructive/10 text-destructive px-2 py-0.5 rounded-md border border-destructive/20 flex items-center gap-1 hover:bg-destructive/20 transition-all">
-                      <RefreshCcw className="w-2.5 h-2.5" /> Reset
+                    <button onClick={() => setCssOverride(null)} className="text-[10px] font-bold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
+                      <RefreshCcw className="w-3 h-3" /> Reset
                     </button>
                   )}
                 </div>
-                <textarea
-                  value={cssOverride ?? exportAsCSS(state)}
-                  onChange={(e) => setCssOverride(e.target.value)}
-                  className="w-full h-[300px] bg-background p-3 rounded-xl font-mono text-[10px] text-muted-foreground leading-relaxed outline-none border border-border focus:border-primary/30 resize-none transition-colors"
-                  spellCheck={false} />
-                <p className="text-[9px] text-editor-text-dim">Edit CSS directly. Slider changes reset manual edits.</p>
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-primary/5 blur-xl group-focus-within:bg-primary/10 transition-colors pointer-events-none" />
+                  <textarea
+                    value={cssOverride ?? exportAsCSS(state)}
+                    onChange={(e) => setCssOverride(e.target.value)}
+                    className="w-full h-[400px] bg-black/40 p-4 rounded-xl font-mono text-[11px] text-white/70 leading-relaxed outline-none border border-white/5 focus:border-primary/40 focus:text-white resize-none transition-all relative z-10 custom-scrollbar"
+                    spellCheck={false} />
+                </div>
+                <p className="text-[9px] text-white/30 font-medium italic">Directly manipulate the generated CSS engine.</p>
               </div>
             )}
           </motion.div>

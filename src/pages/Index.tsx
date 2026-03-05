@@ -58,11 +58,11 @@ export default function Index() {
   const activeCss = cssOverride ?? exportAsCSS(currentState);
 
   return (
-    <div className="h-screen editor-bg text-foreground font-mono selection:bg-primary/20 overflow-hidden flex flex-col">
+    <div className="h-screen editor-bg text-foreground font-sans selection:bg-primary/30 overflow-hidden flex flex-col">
       <style dangerouslySetInnerHTML={{ __html: activeCss }} />
 
       {/* 3-column workspace */}
-      <div className="flex-1 flex gap-3 p-3 min-h-0">
+      <div className="flex-1 flex gap-2 p-2 min-h-0">
         {/* Left Sidebar */}
         <LeftSidebar
           state={currentState}
@@ -77,29 +77,18 @@ export default function Index() {
         />
 
         {/* Center Canvas */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 gap-2">
-          {/* Canvas header bar */}
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-2">
-              <ABSplitToggle isOpen={showABSplit} onToggle={() => setShowABSplit(!showABSplit)} />
-              <span className="text-[10px] text-editor-text-dim font-medium hidden sm:inline">
-                <kbd className="px-1 py-0.5 rounded bg-secondary border border-border text-[9px] font-mono">⌘Z</kbd> undo
-                <kbd className="px-1 py-0.5 rounded bg-secondary border border-border text-[9px] font-mono ml-2">⌘⇧Z</kbd> redo
-              </span>
-            </div>
-          </div>
-
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 gap-2 p-1">
           {/* A/B Split */}
           <AnimatePresence>
             {showABSplit && (
-              <div className="w-full max-w-[860px] mx-auto">
+              <div className="w-full max-w-[960px] mx-auto mb-2">
                 <ABSplitView currentState={currentState} onClose={() => setShowABSplit(false)} />
               </div>
             )}
           </AnimatePresence>
 
           {/* Preview Canvas */}
-          <div className="flex-1 min-h-0 relative">
+          <div className="flex-1 min-h-0 relative bg-black/10 rounded-[2.5rem] border border-white/5 overflow-hidden shadow-inner">
             <GlowPreview
               state={currentState}
               setPower={(v) => handleStateChange({ ...currentState, power: v })}
