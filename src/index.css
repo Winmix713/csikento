@@ -35,13 +35,16 @@
     --ring: 142 71% 45%;
 
     --radius: 0.75rem;
-    --radius-sm: 6px;
-    --radius-lg: 14px;
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --radius-2xl: calc(var(--radius) + 12px);
 
     /* Glass & Surface tokens */
     --glass-bg: 0 0% 7%;
     --glass-border: 0 0% 21%;
-    --glass-border-hover: 0 0% 29%;
+    --glass-border-hover: 0 0% 32%;
     --glass-highlight: 0 0% 100%;
 
     /* Editor surfaces */
@@ -97,31 +100,23 @@
 
 .glass-surface {
   background:
-    linear-gradient(64deg, hsla(0 0% 100% / 0) 42%, hsla(0 0% 100% / 0.04) 100%),
-    linear-gradient(62deg, hsla(0 0% 100% / 0) -20%, hsla(0 0% 100% / 0.05) 76%),
-    hsla(0 0% 7% / 0.55);
-  backdrop-filter: blur(var(--blur-panel)) saturate(1.2);
-  -webkit-backdrop-filter: blur(var(--blur-panel)) saturate(1.2);
-  border: 1px solid hsla(0 0% 21% / 0.70);
+    linear-gradient(110deg, hsla(0 0% 100% / 0.03) 0%, hsla(0 0% 100% / 0) 50%, hsla(0 0% 100% / 0.02) 100%),
+    hsla(var(--glass-bg) / 0.45);
+  backdrop-filter: blur(var(--blur-panel)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--blur-panel)) saturate(1.4);
+  border: 1px solid hsla(0 0% 100% / 0.08);
   box-shadow:
     var(--shadow-depth),
     var(--shadow-ambient),
-    var(--shadow-close),
-    var(--shadow-inset),
-    var(--shadow-top);
-  transition:
-    box-shadow var(--t-normal) var(--ease-smooth),
-    border-color var(--t-normal) var(--ease-smooth);
+    var(--shadow-inset);
+  transition: all var(--t-normal) var(--ease-smooth);
 }
 
 .glass-surface:hover {
-  border-color: hsla(0 0% 29% / 0.80);
-  box-shadow:
-    0 24px 70px hsla(0 0% 0% / 0.60),
-    var(--shadow-ambient),
-    var(--shadow-close),
-    var(--shadow-inset),
-    var(--shadow-top);
+  border-color: hsla(0 0% 100% / 0.12);
+  background:
+    linear-gradient(110deg, hsla(0 0% 100% / 0.05) 0%, hsla(0 0% 100% / 0) 50%, hsla(0 0% 100% / 0.04) 100%),
+    hsla(var(--glass-bg) / 0.55);
 }
 
 /* Control section — individual glass card */
@@ -167,9 +162,18 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(180deg, hsla(0 0% 92% / 0.07) -27%, hsla(0 0% 77% / 0.10) 127%);
-  border: 1.5px solid hsla(0 0% 66% / 0.08);
-  box-shadow: var(--shadow-inset);
+  background: linear-gradient(180deg, hsla(0 0% 100% / 0.08) 0%, hsla(0 0% 100% / 0.02) 100%);
+  border: 1px solid hsla(0 0% 100% / 0.1);
+  box-shadow:
+    var(--shadow-inset),
+    0 4px 12px -2px hsla(0 0% 0% / 0.2);
+  transition: all var(--t-normal) var(--ease-spring);
+}
+
+.icon-wrap:hover {
+  background: linear-gradient(180deg, hsla(0 0% 100% / 0.12) 0%, hsla(0 0% 100% / 0.04) 100%);
+  border-color: hsla(0 0% 100% / 0.15);
+  transform: translateY(-1px);
 }
 
 /* ========================================
@@ -262,7 +266,7 @@
 /* Canvas background — subtle dot grid */
 .canvas-bg {
   background:
-    radial-gradient(circle at 50% 50%, hsla(0 0% 8% / 1) 0%, hsla(0 0% 5% / 1) 100%);
+    radial-gradient(circle at 50% 50%, hsla(0 0% 6% / 1) 0%, hsla(0 0% 4% / 1) 100%);
   position: relative;
 }
 
@@ -270,8 +274,11 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(hsla(0 0% 100% / 0.04) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-image:
+    radial-gradient(hsla(0 0% 100% / 0.03) 1px, transparent 1px),
+    linear-gradient(hsla(0 0% 100% / 0.01) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(0 0% 100% / 0.01) 1px, transparent 1px);
+  background-size: 32px 32px, 128px 128px, 128px 128px;
   pointer-events: none;
 }
 

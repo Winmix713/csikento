@@ -212,15 +212,15 @@ export function RightSidebar({ state, onStateChange, cssOverride, setCssOverride
   return (
     <div className="w-[280px] flex-shrink-0 glass-surface rounded-2xl flex flex-col max-h-[calc(100vh-5rem)] overflow-hidden">
       {/* Tab bar */}
-      <div className="p-3 pb-0">
-        <div className="flex bg-editor-surface rounded-xl p-0.5 gap-0.5 border border-editor-border/50 relative">
+      <div className="p-4 pb-0">
+        <div className="flex bg-editor-surface/80 backdrop-blur-md rounded-2xl p-1 gap-1 border border-editor-border/30 relative shadow-inner">
           {tabs.map(({ id, label, icon: Icon }) => (
             <button key={id} onClick={() => setActiveTab(id)}
-              className={cn("flex-1 py-1.5 text-[10px] font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 relative z-10",
-                activeTab === id ? "text-foreground" : "text-editor-text-dim hover:text-muted-foreground")}>
-              <Icon className="w-3 h-3" /> {label}
+              className={cn("flex-1 py-2 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 relative z-10",
+                activeTab === id ? "text-foreground shadow-sm" : "text-editor-text-dim hover:text-foreground hover:bg-editor-surface/40")}>
+              <Icon className={cn("w-3.5 h-3.5 transition-transform", activeTab === id && "scale-110")} /> {label}
               {activeTab === id && (
-                <motion.div layoutId="right-tab-bg" className="absolute inset-0 bg-secondary rounded-lg shadow-sm -z-10"
+                <motion.div layoutId="right-tab-bg" className="absolute inset-0 bg-secondary rounded-xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.3)] -z-10"
                   transition={{ type: "spring", stiffness: 500, damping: 35 }} />
               )}
             </button>

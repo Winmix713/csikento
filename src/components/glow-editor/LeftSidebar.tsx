@@ -77,27 +77,41 @@ function LayerManager({ layers, selectedId, onSelect, onUpdate, onAdd, onRemove,
                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 onClick={() => onSelect(layer.id)}
                 className={cn(
-                  "group flex items-center gap-1.5 p-2 rounded-xl text-xs cursor-pointer border transition-all",
+                  "group flex items-center gap-2 p-2.5 rounded-xl text-xs cursor-pointer border transition-all relative overflow-hidden",
                   selectedId === layer.id
-                    ? "bg-secondary border-editor-border-hover text-foreground shadow-sm"
+                    ? "bg-secondary/80 border-primary/20 text-foreground shadow-sm backdrop-blur-md"
                     : "bg-transparent border-transparent hover:bg-editor-surface hover:border-editor-border text-muted-foreground"
                 )}
               >
-                <motion.div className="w-0.5 h-5 rounded-full bg-primary flex-shrink-0" initial={false}
-                  animate={{ opacity: selectedId === layer.id ? 1 : 0, scaleY: selectedId === layer.id ? 1 : 0 }}
+                {/* Active indicator */}
+                <motion.div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-1/2 rounded-full bg-primary" initial={false}
+                  animate={{ opacity: selectedId === layer.id ? 1 : 0, scaleY: selectedId === layer.id ? 1 : 0.4 }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }} />
-                <div className="flex flex-col gap-0.5">
-                  <button onClick={(e) => moveLayer(layer.id, "up", e)} disabled={ri >= layers.length - 1} className="text-editor-text-dim hover:text-foreground disabled:opacity-15 transition-colors"><ChevronUp className="w-2.5 h-2.5" /></button>
-                  <button onClick={(e) => moveLayer(layer.id, "down", e)} disabled={ri <= 0} className="text-editor-text-dim hover:text-foreground disabled:opacity-15 transition-colors"><ChevronDown className="w-2.5 h-2.5" /></button>
+
+                <div className="flex flex-col gap-0.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                  <button onClick={(e) => moveLayer(layer.id, "up", e)} disabled={ri >= layers.length - 1} className="text-editor-text-dim hover:text-foreground disabled:opacity-0 transition-all"><ChevronUp className="w-2.5 h-2.5" /></button>
+                  <button onClick={(e) => moveLayer(layer.id, "down", e)} disabled={ri <= 0} className="text-editor-text-dim hover:text-foreground disabled:opacity-0 transition-all"><ChevronDown className="w-2.5 h-2.5" /></button>
                 </div>
-                <button onClick={(e) => toggleVis(layer.id, e)} className="text-editor-text-dim hover:text-foreground transition-colors">
-                  {layer.active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+
+                <button onClick={(e) => toggleVis(layer.id, e)} className="text-editor-text-dim hover:text-foreground transition-colors ml-0.5">
+                  {layer.active ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5 text-editor-text-muted" />}
                 </button>
-                <motion.div className="w-3 h-3 rounded-full flex-shrink-0 ring-1 ring-editor-border" style={{ backgroundColor: layer.color }} layoutId={`lc-${layer.id}`} />
-                <span className="flex-1 text-[11px] font-medium truncate">{layer.name}</span>
-                <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={(e) => { e.stopPropagation(); onDuplicate(layer.id); }} className="p-0.5 rounded hover:text-primary transition-colors"><CopyPlus className="w-2.5 h-2.5" /></button>
-                  <button onClick={(e) => { e.stopPropagation(); onRemove(layer.id); }} className="p-0.5 rounded hover:text-destructive transition-colors"><Trash2 className="w-2.5 h-2.5" /></button>
+
+                <motion.div
+                  className="w-4 h-4 rounded-full flex-shrink-0 border border-white/10 shadow-sm relative overflow-hidden"
+                  style={{ backgroundColor: layer.color }}
+                  layoutId={`lc-${layer.id}`}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-white/20 pointer-events-none" />
+                </motion.div>
+
+                <span className={cn("flex-1 text-[11px] font-medium truncate transition-colors", selectedId === layer.id ? "text-foreground" : "text-muted-foreground")}>
+                  {layer.name}
+                </span>
+
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity pr-1">
+                  <button onClick={(e) => { e.stopPropagation(); onDuplicate(layer.id); }} className="p-1 rounded-md hover:bg-editor-surface-hover hover:text-primary transition-all shadow-none"><CopyPlus className="w-3 h-3" /></button>
+                  <button onClick={(e) => { e.stopPropagation(); onRemove(layer.id); }} className="p-1 rounded-md hover:bg-destructive/10 hover:text-destructive transition-all shadow-none"><Trash2 className="w-3 h-3" /></button>
                 </div>
               </motion.div>
             );
