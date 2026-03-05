@@ -79,13 +79,27 @@ export default function Index() {
         {/* Center Canvas */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 gap-2">
           {/* Canvas header bar */}
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-2">
-              <ABSplitToggle isOpen={showABSplit} onToggle={() => setShowABSplit(!showABSplit)} />
-              <span className="text-[10px] text-editor-text-dim font-medium hidden sm:inline">
-                <kbd className="px-1 py-0.5 rounded bg-secondary border border-border text-[9px] font-mono">⌘Z</kbd> undo
-                <kbd className="px-1 py-0.5 rounded bg-secondary border border-border text-[9px] font-mono ml-2">⌘⇧Z</kbd> redo
+          <div className="flex items-center justify-between px-4 py-1">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <ABSplitToggle isOpen={showABSplit} onToggle={() => setShowABSplit(!showABSplit)} />
+                <div className="h-4 w-px bg-border/40 mx-1" />
+                <span className="text-[10px] text-editor-text-dim font-medium flex items-center gap-1.5 uppercase tracking-wider">
+                  Workspace <span className="text-primary/60">/</span> {currentState.layers.length} Layers
+                </span>
+              </div>
+              <span className="text-[10px] text-editor-text-dim font-medium hidden lg:inline-flex items-center gap-3">
+                <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 rounded bg-secondary border border-border text-[9px] font-mono shadow-sm">⌘Z</kbd> undo</span>
+                <span className="flex items-center gap-1"><kbd className="px-1.5 py-0.5 rounded bg-secondary border border-border text-[9px] font-mono shadow-sm">⌘⇧Z</kbd> redo</span>
               </span>
+            </div>
+            <div className="flex items-center gap-2">
+               {/* Quick status dots */}
+               <div className="flex gap-1.5 mr-2">
+                 <div className={cn("w-1.5 h-1.5 rounded-full", currentState.power ? "bg-primary animate-pulse" : "bg-muted")} />
+                 <div className={cn("w-1.5 h-1.5 rounded-full", currentState.noiseEnabled ? "bg-amber-400" : "bg-muted")} />
+                 <div className={cn("w-1.5 h-1.5 rounded-full", currentState.animation.enabled ? "bg-sky-400" : "bg-muted")} />
+               </div>
             </div>
           </div>
 

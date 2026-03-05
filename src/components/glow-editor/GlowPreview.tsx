@@ -94,9 +94,9 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
   return (
     <div className="flex flex-col h-full w-full relative" onWheel={handleWheel}>
       {/* Floating top toolbar */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3">
         {/* Device switcher */}
-        <div className="flex items-center gap-0.5 canvas-toolbar">
+        <div className="flex items-center gap-1 canvas-toolbar p-1.5 backdrop-blur-xl border-white/5 shadow-2xl">
           {(["mobile", "tablet", "desktop"] as const).map((size) => {
             const Icon = frameDimensions[size].icon;
             return (
@@ -107,14 +107,16 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
           })}
         </div>
 
+        <div className="w-px h-6 bg-white/5" />
+
         {/* Zoom controls */}
-        <div className="flex items-center gap-0.5 canvas-toolbar">
+        <div className="flex items-center gap-1 canvas-toolbar p-1.5 backdrop-blur-xl border-white/5 shadow-2xl">
           <ToolBtn onClick={() => handleZoom("out")} title="Zoom out">
             <ZoomOut className="w-3.5 h-3.5" />
           </ToolBtn>
           <button
             onClick={() => handleZoom("reset")}
-            className="px-2.5 py-1.5 text-[10px] text-muted-foreground hover:text-foreground font-mono min-w-[44px] text-center transition-colors rounded-md hover:bg-secondary/50"
+            className="px-3 py-1.5 text-[10px] text-muted-foreground hover:text-foreground font-bold min-w-[50px] text-center transition-all rounded-xl hover:bg-white/5"
           >
             {Math.round(zoom * 100)}%
           </button>
@@ -123,8 +125,10 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
           </ToolBtn>
         </div>
 
+        <div className="w-px h-6 bg-white/5" />
+
         {/* View tools */}
-        <div className="flex items-center gap-0.5 canvas-toolbar">
+        <div className="flex items-center gap-1 canvas-toolbar p-1.5 backdrop-blur-xl border-white/5 shadow-2xl">
           <ToolBtn active={showDimensions} onClick={() => setShowDimensions(!showDimensions)} title="Dimensions">
             <Maximize2 className="w-4 h-4" />
           </ToolBtn>
@@ -133,16 +137,6 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
           </ToolBtn>
           <ToolBtn active={showRulers} onClick={() => setShowRulers(!showRulers)} title="Rulers">
             <Ruler className="w-4 h-4" />
-          </ToolBtn>
-        </div>
-
-        {/* Export */}
-        <div className="flex items-center gap-0.5 canvas-toolbar">
-          <ToolBtn onClick={handleExportImage} title="Export PNG">
-            {isExporting ? <Activity className="w-4 h-4 animate-pulse text-primary" /> : <Download className="w-4 h-4" />}
-          </ToolBtn>
-          <ToolBtn onClick={handleExportSVG} title="Export SVG">
-            <FileImage className="w-4 h-4" />
           </ToolBtn>
         </div>
       </div>
@@ -322,13 +316,13 @@ function ToolBtn({ active, onClick, children, title }: { active?: boolean; onCli
     <motion.button
       onClick={onClick}
       title={title}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.92 }}
+      whileHover={{ scale: 1.05, y: -1 }}
+      whileTap={{ scale: 0.95 }}
       className={cn(
-        "p-2 rounded-lg transition-all duration-150",
+        "p-2 rounded-xl transition-all duration-200 border-transparent border",
         active
-          ? "bg-secondary text-foreground shadow-sm"
-          : "text-editor-text-dim hover:text-foreground hover:bg-secondary/50"
+          ? "bg-primary/10 text-primary border-primary/20 shadow-[0_0_15px_-3px_rgba(var(--primary),0.3)]"
+          : "text-editor-text-dim hover:text-foreground hover:bg-white/5 hover:border-white/5"
       )}
     >
       {children}
