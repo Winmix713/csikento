@@ -74,55 +74,60 @@ export function ABSplitView({ currentState, onClose }: ABSplitViewProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10, scale: 0.97 }}
+      initial={{ opacity: 0, y: -20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 10, scale: 0.97 }}
+      exit={{ opacity: 0, y: -20, scale: 0.95 }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className="glass-surface rounded-2xl p-4 space-y-3 shadow-2xl"
+      className="glass-surface rounded-[2rem] p-6 space-y-5 shadow-2xl border-white/10 backdrop-blur-3xl relative overflow-hidden group"
     >
+      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <SplitSquareHorizontal className="w-4 h-4 text-primary" />
-          <span className="text-xs font-bold text-foreground">A/B Compare</span>
+      <div className="flex items-center justify-between relative z-10">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
+            <SplitSquareHorizontal className="w-4 h-4 text-primary shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs font-bold text-white uppercase tracking-widest leading-none">A/B Engine</span>
+            <span className="text-[9px] text-white/40 font-medium mt-1">Real-time comparison mode</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <button
             onClick={handleResnapshot}
-            title="Re-snapshot current as A"
-            className="p-1.5 rounded-lg text-editor-text-dim hover:text-foreground hover:bg-editor-surface-hover transition-all"
+            title="Update snapshot"
+            className="p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all flex items-center gap-2"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-4 h-4" />
+            <span className="text-[10px] font-bold uppercase hidden sm:inline">Snapshot</span>
           </button>
-          <button
-            onClick={() => setLocked(!locked)}
-            title={locked ? "Snapshot locked" : "Snapshot unlocked"}
-            className={cn(
-              "p-1.5 rounded-lg transition-all",
-              locked ? "text-primary bg-primary/10" : "text-editor-text-dim hover:text-foreground hover:bg-editor-surface-hover"
-            )}
-          >
-            {locked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-          </button>
+          <div className="w-px h-4 bg-white/10" />
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-editor-text-dim hover:text-foreground hover:bg-editor-surface-hover transition-all"
+            className="p-2 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {/* Split previews */}
-      <div className="flex gap-3">
-        <GlowMiniPreview state={snapshotState} label="Before" isDark={isDark} />
-        <div className="w-px bg-border/60 self-stretch my-6" />
-        <GlowMiniPreview state={currentState} label="After" isDark={isDark} />
+      <div className="flex gap-6 relative z-10">
+        <GlowMiniPreview state={snapshotState} label="Current Snapshot" isDark={isDark} />
+        <div className="flex flex-col items-center justify-center gap-3">
+           <div className="w-px flex-1 bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+           <div className="p-2 rounded-full bg-white/5 border border-white/10">
+             <SplitSquareHorizontal className="w-3 h-3 text-white/20" />
+           </div>
+           <div className="w-px flex-1 bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+        </div>
+        <GlowMiniPreview state={currentState} label="Live Evolution" isDark={isDark} />
       </div>
 
-      <p className="text-[10px] text-editor-text-dim text-center font-medium">
-        "Before" shows your snapshot · Edit controls to see changes in "After"
-      </p>
+      <div className="pt-2 border-t border-white/5 text-center relative z-10">
+        <span className="text-[9px] text-white/30 font-bold uppercase tracking-[0.2em]">Snapshot locked at point of entry · Edit to see evolution</span>
+      </div>
     </motion.div>
   );
 }

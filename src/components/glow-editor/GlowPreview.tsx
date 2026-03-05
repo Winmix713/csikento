@@ -92,11 +92,12 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
   }, []);
 
   return (
-    <div className="flex flex-col h-full w-full relative" onWheel={handleWheel}>
+    <div className="flex flex-col h-full w-full relative group/canvas" onWheel={handleWheel}>
       {/* Floating top toolbar */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3">
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 transition-all duration-500 opacity-60 hover:opacity-100 group-hover/canvas:translate-y-[-4px]">
         {/* Device switcher */}
-        <div className="flex items-center gap-1 canvas-toolbar p-1.5 px-2 bg-black/40 border-white/10 backdrop-blur-2xl rounded-2xl shadow-2xl">
+        <div className="flex items-center gap-1.5 p-2 px-3 bg-black/60 border border-white/10 backdrop-blur-3xl rounded-[1.5rem] shadow-2xl relative overflow-hidden group/toolbar">
+          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover/toolbar:opacity-100 transition-opacity pointer-events-none" />
           {(["mobile", "tablet", "desktop"] as const).map((size) => {
             const Icon = frameDimensions[size].icon;
             return (
@@ -108,63 +109,72 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
         </div>
 
         {/* Zoom controls */}
-        <div className="flex items-center gap-1 canvas-toolbar p-1.5 px-3 bg-black/40 border-white/10 backdrop-blur-2xl rounded-2xl shadow-2xl">
+        <div className="flex items-center gap-1.5 p-2 px-4 bg-black/60 border border-white/10 backdrop-blur-3xl rounded-[1.5rem] shadow-2xl group/zoom">
           <ToolBtn onClick={() => handleZoom("out")} title="Zoom out">
             <ZoomOut className="w-4 h-4" />
           </ToolBtn>
-          <button
-            onClick={() => handleZoom("reset")}
-            className="px-3 py-1.5 text-[11px] text-white/50 hover:text-white font-bold min-w-[50px] text-center transition-all rounded-xl hover:bg-white/5"
-          >
-            {Math.round(zoom * 100)}%
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => handleZoom("reset")}
+              className="px-3 py-1.5 text-[11px] text-white/50 hover:text-white font-black min-w-[54px] text-center transition-all rounded-xl hover:bg-white/10 tracking-widest"
+            >
+              {Math.round(zoom * 100)}%
+            </button>
+          </div>
           <ToolBtn onClick={() => handleZoom("in")} title="Zoom in">
             <ZoomIn className="w-4 h-4" />
           </ToolBtn>
         </div>
 
-        {/* View tools */}
-        <div className="flex items-center gap-1 canvas-toolbar p-1.5 px-2 bg-black/40 border-white/10 backdrop-blur-2xl rounded-2xl shadow-2xl">
+        {/* View & Export tools combined */}
+        <div className="flex items-center gap-1.5 p-2 px-3 bg-black/60 border border-white/10 backdrop-blur-3xl rounded-[1.5rem] shadow-2xl">
           <ToolBtn active={showDimensions} onClick={() => setShowDimensions(!showDimensions)} title="Dimensions">
             <Maximize2 className="w-4 h-4" />
           </ToolBtn>
           <ToolBtn active={showGrid} onClick={() => setShowGrid(!showGrid)} title="Grid overlay">
             <Grid3X3 className="w-4 h-4" />
           </ToolBtn>
-        </div>
-
-        {/* Export */}
-        <div className="flex items-center gap-1 canvas-toolbar p-1.5 px-2 bg-black/40 border-white/10 backdrop-blur-2xl rounded-2xl shadow-2xl">
-          <ToolBtn onClick={handleExportImage} title="Export PNG">
-            {isExporting ? <Activity className="w-4 h-4 animate-pulse text-primary" /> : <Download className="w-4 h-4" />}
+          <div className="w-px h-4 bg-white/10 mx-1" />
+          <ToolBtn onClick={handleExportImage} title="Export PNG" className="bg-primary/20 text-primary hover:bg-primary hover:text-black">
+            {isExporting ? <Activity className="w-4 h-4 animate-pulse" /> : <Download className="w-4 h-4" />}
           </ToolBtn>
         </div>
       </div>
 
       {/* Canvas area */}
-      <div className="flex-1 flex items-center justify-center relative canvas-bg rounded-xl overflow-hidden">
+      <div className="flex-1 flex items-center justify-center relative bg-[#050505] overflow-hidden group/studio">
+        {/* Subtle radial center highlight */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none" />
+
         {/* Rulers */}
         {showRulers && <CanvasRulers width={currentFrame.w} height={currentFrame.h} zoom={zoom} />}
 
         {/* Frame container with zoom */}
-        <div className="relative" style={{ transform: `scale(${zoom})`, transformOrigin: "center center", transition: "transform 0.2s ease" }}>
-          {/* Frame shadow glow */}
-          <div className="absolute -inset-4 rounded-3xl opacity-30 blur-2xl pointer-events-none" style={{
-            background: state.power && activeLayerCount > 0
-              ? `radial-gradient(ellipse, ${state.layers.find(l => l.active)?.color ?? 'transparent'}40, transparent 70%)`
-              : 'transparent',
-            transition: 'opacity 0.5s ease'
-          }} />
+        <div className="relative z-10" style={{ transform: `scale(${zoom})`, transformOrigin: "center center", transition: "transform 0.4s cubic-bezier(0.2, 0, 0, 1)" }}>
+          {/* Enhanced Frame shadow glow - Reactive to first active layer color */}
+          <motion.div
+            animate={{
+              scale: [1, 1.05, 1],
+              opacity: state.power ? [0.2, 0.35, 0.2] : 0
+            }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -inset-20 rounded-[4rem] blur-[100px] pointer-events-none z-0"
+            style={{
+              background: state.power && activeLayerCount > 0
+                ? `radial-gradient(circle, ${state.layers.find(l => l.active)?.color ?? 'transparent'}50, transparent 75%)`
+                : 'transparent',
+            }}
+          />
 
           {/* Preview frame */}
           <div
             ref={previewRef}
             className={cn(
-              "relative overflow-hidden rounded-2xl border transition-all duration-300",
+              "relative overflow-hidden rounded-[2rem] border transition-all duration-500 z-10",
               isDark
-                ? "bg-background border-border/30"
+                ? "bg-black border-white/10"
                 : "bg-neutral-100 border-neutral-300/40",
-              "shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_20px_60px_-15px_rgba(0,0,0,0.5),0_4px_20px_-5px_rgba(0,0,0,0.3)]"
+              "shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_40px_120px_-20px_rgba(0,0,0,0.8),0_12px_40px_-10px_rgba(0,0,0,0.4)]"
             )}
             style={{ width: currentFrame.w, height: currentFrame.h }}
           >
@@ -282,19 +292,23 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
       </div>
 
       {/* Bottom status bar */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30">
-        <div className="canvas-toolbar px-5 py-2.5 flex items-center gap-4 text-[10px] font-bold text-white/50 bg-black/40 border-white/10 backdrop-blur-2xl rounded-2xl shadow-2xl">
-          <span className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.5)]" />
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 transition-all duration-500 opacity-60 hover:opacity-100 group-hover/canvas:translate-y-[4px]">
+        <div className="px-6 py-3 flex items-center gap-6 text-[10px] font-black tracking-[0.2em] text-white/40 bg-black/60 border border-white/10 backdrop-blur-3xl rounded-[1.5rem] shadow-2xl uppercase">
+          <span className="flex items-center gap-3">
+            <motion.div
+              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_12px_rgba(var(--primary),0.6)]"
+            />
             {currentFrame.w}×{currentFrame.h}
           </span>
-          <span className="w-px h-3 bg-white/10" />
-          <span className="uppercase tracking-wider">{activeLayerCount} active layer{activeLayerCount !== 1 ? 's' : ''}</span>
+          <span className="w-px h-4 bg-white/10" />
+          <span>{activeLayerCount} LAYERS ACTIVE</span>
           {selectedLayer && (
             <>
-              <span className="w-px h-3 bg-white/10" />
-              <span className="flex items-center gap-2 text-white/80">
-                <MousePointer2 className="w-3 h-3 text-primary" />
+              <span className="w-px h-4 bg-white/10" />
+              <span className="flex items-center gap-2 text-primary font-black">
+                <MousePointer2 className="w-3.5 h-3.5" />
                 {selectedLayer.name}
               </span>
             </>
@@ -306,18 +320,19 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
 }
 
 /* ── Toolbar button ── */
-function ToolBtn({ active, onClick, children, title }: { active?: boolean; onClick: () => void; children: React.ReactNode; title?: string }) {
+function ToolBtn({ active, onClick, children, title, className }: { active?: boolean; onClick: () => void; children: React.ReactNode; title?: string; className?: string }) {
   return (
     <motion.button
       onClick={onClick}
       title={title}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.92 }}
+      whileHover={{ scale: 1.1, y: -2 }}
+      whileTap={{ scale: 0.9 }}
       className={cn(
-        "p-2 rounded-lg transition-all duration-150",
+        "p-2.5 rounded-xl transition-all duration-200",
         active
-          ? "bg-secondary text-foreground shadow-sm"
-          : "text-editor-text-dim hover:text-foreground hover:bg-secondary/50"
+          ? "bg-white/10 text-white shadow-[0_0_20px_rgba(255,255,255,0.1)] border border-white/10"
+          : "text-white/40 hover:text-white hover:bg-white/5",
+        className
       )}
     >
       {children}
