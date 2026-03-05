@@ -1,7 +1,86 @@
 import type { GlowState } from "./glow-types";
-import { exportAsCSS } from "./glow-types";
 
 export type ExportFormat = "css" | "tailwind" | "react" | "svg";
+
+export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
+  func: T,
+  wait: number,
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return function executedFunction(...args: Parameters<T>) {
+    const later = () => {
+      timeout = null;
+      func(...args);
+    };
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+export function exportAsCSS(state: GlowState): string {
+  const layersCss = state.layers
+    .filter((l) => l.active)
+    .map(
+      (layer, i) => `
+.glow-layer-${i + 1} {
+  /* ${layer.name} */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translate(${layer.x}px, ${layer.y}px);
+  width: ${layer.width}px;
+  height: ${layer.height}px;
+  background-color: ${layer.color};
+  filter: blur(${layer.blur}px);
+  opacity: ${layer.opacity};
+  border-radius: 9999px;
+  mix-blend-mode: ${layer.blendMode};
+  z-index: ${i};
+  pointer-events: auto;
+}`,
+    )
+    .join("\n");
+
+  const animationCss = state.animation.enabled
+    ? `
+@keyframes breathe {
+  0%, 100% { opacity: ${state.globalOpacity}; transform: scale(${state.globalScale}); }
+  50% { opacity: ${state.globalOpacity * 0.8}; transform: scale(${state.globalScale * 1.05}); }
+}
+
+.glow-container {
+  animation: breathe ${state.animation.duration}s ease-in-out infinite;
+}`
+    : "";
+
+  return `/* Glow Effect CSS */
+.glow-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: scale(${state.globalScale});
+  opacity: ${state.globalOpacity};
+  
+}
+${animationCss}
+${layersCss}
+${
+  state.noiseEnabled
+    ? `
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.15'/></svg>");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: ${state.noiseIntensity};
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 100;
+}`
+    : ""
+}`;
+}
 
 export function exportAsTailwind(state: GlowState): string {
   const layers = state.layers

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { AnimatePresence } from "motion/react";
 import { GlowPreview } from "@/components/glow-editor/GlowPreview";
 import { LeftSidebar } from "@/components/glow-editor/LeftSidebar";
@@ -6,8 +6,27 @@ import { RightSidebar, ExportModal } from "@/components/glow-editor/RightSidebar
 import { ABSplitView, ABSplitToggle } from "@/components/glow-editor/ABSplitView";
 import { useHistory, usePresets } from "@/hooks/use-glow-editor";
 import { usePersistedState } from "@/hooks/use-persisted-state";
-import { exportAsCSS, debounce, INITIAL_STATE } from "@/lib/glow-types";
+import { exportAsCSS } from "@/lib/glow-export";
+import { debounce, INITIAL_STATE } from "@/lib/glow-types";
 import type { GlowState } from "@/lib/glow-types";
+
+function GlowStyleTag({ css }: { css: string }) {
+  const styleRef = useRef<HTMLStyleElement | null>(null);
+
+  if (!styleRef.current) {
+    styleRef.current = document.createElement("style");
+    styleRef.current.id = "glow-dynamic-styles";
+    document.head.appendChild(styleRef.current);
+  }
+
+  useEffect(() => {
+    if (styleRef.current) {
+      styleRef.current.textContent = css;
+    }
+  }, [css]);
+
+  return null;
+}
 
 export default function Index() {
   const { state: currentState, setState: setCurrentState } = usePersistedState();
@@ -59,7 +78,7 @@ export default function Index() {
 
   return (
     <div className="h-screen editor-bg text-foreground font-sans selection:bg-primary/30 overflow-hidden flex flex-col">
-      <style dangerouslySetInnerHTML={{ __html: activeCss }} />
+      <GlowStyleTag css={activeCss} />
 
       {/* 3-column workspace */}
       <div className="flex-1 flex gap-2 p-2 min-h-0">
