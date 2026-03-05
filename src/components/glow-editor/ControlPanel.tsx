@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import type { GlowState, GlowLayer, BlendMode } from "@/lib/glow-types";
-import { exportAsCSS } from "@/lib/glow-types";
+import { exportAsCSS } from "@/lib/glow-export";
 import { BUILT_IN_PRESETS, PRESET_CATEGORIES } from "@/lib/glow-presets";
 import { exportForFormat, type ExportFormat } from "@/lib/glow-export";
 import { getColorPalette, duplicateLayer, generateRandomGlow } from "@/lib/glow-utils";

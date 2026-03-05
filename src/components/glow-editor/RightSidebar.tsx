@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import type { GlowState, GlowLayer, BlendMode } from "@/lib/glow-types";
-import { exportAsCSS } from "@/lib/glow-types";
+import { exportAsCSS } from "@/lib/glow-export";
 import { exportForFormat, type ExportFormat } from "@/lib/glow-export";
 import { getColorPalette, getColorHarmonies } from "@/lib/glow-utils";
 
