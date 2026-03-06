@@ -5,6 +5,7 @@
 export type BlendMode = "normal" | "screen" | "overlay" | "soft-light" | "color-dodge" | "multiply";
 export type SceneType = "studio" | "glass" | "night" | "clean";
 export type MotionType = "none" | "pulse" | "breathe" | "orbit" | "float" | "sequence" | "waver" | "glitch" | "rainbow";
+export type ComponentType = "button" | "card" | "header" | "hero" | "input" | "modal" | "nav" | "badge";
 
 export interface GlowLayer {
   id: string;
@@ -37,6 +38,7 @@ export interface GlowState {
   layers: GlowLayer[];
   selectedLayerId: string | null;
   animation: AnimationConfig;
+  componentType: ComponentType;
 }
 
 export interface Preset {
@@ -121,6 +123,7 @@ export const INITIAL_STATE: GlowState = {
     type: "breathe",
     duration: 3,
   },
+  componentType: "hero",
 };
 
 // Built-in presets moved to src/lib/glow-presets.ts

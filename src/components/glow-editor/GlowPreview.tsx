@@ -26,6 +26,97 @@ const frameDimensions = {
 };
 
 /* ── Scene Components ── */
+function ComponentPlaceholder({ type, isDark }: { type: string; isDark: boolean }) {
+  const color = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+  const stroke = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
+
+  switch (type) {
+    case "button":
+      return (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-40 h-12 rounded-xl border-2 border-dashed flex items-center justify-center" style={{ borderColor: stroke, backgroundColor: color }}>
+            <div className="w-20 h-2 rounded-full" style={{ backgroundColor: stroke }} />
+          </div>
+        </div>
+      );
+    case "card":
+      return (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-10">
+          <div className="w-full h-full rounded-2xl border-2 border-dashed flex flex-col p-6 gap-4" style={{ borderColor: stroke, backgroundColor: color }}>
+            <div className="w-full h-40 rounded-xl" style={{ backgroundColor: stroke }} />
+            <div className="w-3/4 h-4 rounded-full" style={{ backgroundColor: stroke }} />
+            <div className="w-1/2 h-4 rounded-full" style={{ backgroundColor: stroke }} />
+          </div>
+        </div>
+      );
+    case "header":
+      return (
+        <div className="absolute inset-0 flex flex-col pointer-events-none">
+          <div className="w-full h-16 border-b-2 border-dashed flex items-center justify-between px-6" style={{ borderColor: stroke, backgroundColor: color }}>
+            <div className="w-24 h-6 rounded-lg" style={{ backgroundColor: stroke }} />
+            <div className="flex gap-4">
+              <div className="w-12 h-4 rounded-full" style={{ backgroundColor: stroke }} />
+              <div className="w-12 h-4 rounded-full" style={{ backgroundColor: stroke }} />
+            </div>
+          </div>
+        </div>
+      );
+    case "hero":
+      return (
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-12 text-center gap-6">
+          <div className="w-3/4 h-12 rounded-xl" style={{ backgroundColor: stroke }} />
+          <div className="w-1/2 h-12 rounded-xl" style={{ backgroundColor: stroke }} />
+          <div className="w-full h-6 rounded-full" style={{ backgroundColor: stroke }} />
+          <div className="w-2/3 h-6 rounded-full" style={{ backgroundColor: stroke }} />
+          <div className="w-32 h-12 rounded-xl mt-4" style={{ backgroundColor: stroke }} />
+        </div>
+      );
+    case "input":
+      return (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-64 h-12 rounded-lg border-2 border-dashed flex items-center px-4" style={{ borderColor: stroke, backgroundColor: color }}>
+            <div className="w-2 h-6 rounded-full animate-pulse" style={{ backgroundColor: stroke }} />
+          </div>
+        </div>
+      );
+    case "modal":
+      return (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-20">
+          <div className="w-full h-full rounded-3xl border-2 border-dashed flex flex-col p-8 gap-6 shadow-2xl" style={{ borderColor: stroke, backgroundColor: color }}>
+            <div className="w-1/2 h-8 rounded-xl" style={{ backgroundColor: stroke }} />
+            <div className="flex-1 rounded-xl" style={{ backgroundColor: stroke }} />
+            <div className="flex justify-end gap-4">
+              <div className="w-24 h-10 rounded-xl" style={{ backgroundColor: stroke }} />
+              <div className="w-24 h-10 rounded-xl" style={{ backgroundColor: stroke }} />
+            </div>
+          </div>
+        </div>
+      );
+    case "nav":
+      return (
+        <div className="absolute inset-0 flex pointer-events-none">
+          <div className="w-20 h-full border-r-2 border-dashed flex flex-col items-center py-10 gap-8" style={{ borderColor: stroke, backgroundColor: color }}>
+            <div className="w-10 h-10 rounded-xl" style={{ backgroundColor: stroke }} />
+            <div className="w-10 h-10 rounded-xl" style={{ backgroundColor: stroke }} />
+            <div className="w-10 h-10 rounded-xl" style={{ backgroundColor: stroke }} />
+            <div className="w-10 h-10 rounded-xl mt-auto" style={{ backgroundColor: stroke }} />
+          </div>
+        </div>
+      );
+    case "badge":
+      return (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="px-4 py-1.5 rounded-full border-2 border-dashed flex items-center justify-center gap-2" style={{ borderColor: stroke, backgroundColor: color }}>
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: stroke }} />
+            <div className="w-16 h-2 rounded-full" style={{ backgroundColor: stroke }} />
+          </div>
+        </div>
+      );
+    default:
+      return null;
+  }
+}
+
 function GlassScene() {
   return (
     <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -208,6 +299,9 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
             )}
             style={{ width: currentFrame.w, height: currentFrame.h }}
           >
+            {/* Component Layout Placeholder */}
+            <ComponentPlaceholder type={state.componentType} isDark={isDark} />
+
             {/* Grid overlay */}
             <AnimatePresence>
               {showGrid && (

@@ -538,7 +538,7 @@ export function LeftSidebar({
             { value: "nav", label: "Nav", icon: <><line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="14" y2="17" /></> },
             { value: "badge", label: "Badge", icon: <><rect x="5" y="9" width="14" height="6" rx="3" /><line x1="9" y1="12" x2="15" y2="12" strokeWidth={1.3} /></> },
           ].map(({ value, label, icon }) => {
-            const isSelected = (state as any).componentType === value;
+            const isSelected = state.componentType === value;
             return (
               <label key={value} style={{ position: "relative" }}>
                 <input
@@ -546,7 +546,13 @@ export function LeftSidebar({
                   name="glowComponent"
                   value={value}
                   checked={isSelected}
-                  onChange={() => updateState({ componentType: value } as any)}
+                  onChange={() => {
+                    updateState({ componentType: value as any });
+                    toast.success(`Switched to ${label} context`, {
+                      icon: <Sparkles className="w-3 h-3 text-primary" />,
+                      description: "The preview now shows a layout template for this component."
+                    });
+                  }}
                   className="absolute opacity-0 w-0 h-0 pointer-events-none"
                 />
                 <motion.span
