@@ -381,15 +381,26 @@ export function RightSidebar({ state, onStateChange, cssOverride, setCssOverride
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="text-[10px] font-bold text-white uppercase tracking-widest">Animation</span>
-                      <span className="text-[9px] text-muted-foreground mt-0.5">Dynamic pulsing</span>
+                      <span className="text-[9px] text-muted-foreground mt-0.5">Dynamic effects</span>
                     </div>
                     <Switch checked={state.animation.enabled} onCheckedChange={(v) => updateState({ animation: { ...state.animation, enabled: v } })} className="data-[state=checked]:bg-primary" />
                   </div>
                   <AnimatePresence>
                     {state.animation.enabled && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                        <div className="space-y-2 pt-2">
-                          <div className="flex justify-between text-[10px] font-bold text-white/50"><span>SPEED</span><span>{state.animation.duration}s</span></div>
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden space-y-4 pt-2">
+                        <div className="space-y-2">
+                          <span className="text-[10px] font-bold text-white/50 uppercase tracking-wider">Effect Type</span>
+                          <Select value={state.animation.type} onValueChange={(v) => updateState({ animation: { ...state.animation, type: v as any } })}>
+                            <SelectTrigger className="h-9 text-[11px] bg-black/20 border-white/10 rounded-xl font-bold hover:bg-black/30 transition-all"><SelectValue /></SelectTrigger>
+                            <SelectContent className="bg-editor-surface border-white/10 backdrop-blur-xl">
+                              {["none", "pulse", "breathe", "orbit", "float", "waver", "glitch", "rainbow", "sequence"].map((m) => (
+                                <SelectItem key={m} value={m} className="text-[11px] font-bold">{m}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-[10px] font-bold text-white/50"><span>SPEED / DURATION</span><span>{state.animation.duration}s</span></div>
                           <AnimatedSlider value={[state.animation.duration]} onValueChange={(v) => updateState({ animation: { ...state.animation, duration: v[0] } })} min={0.5} max={10} step={0.5} />
                         </div>
                       </motion.div>

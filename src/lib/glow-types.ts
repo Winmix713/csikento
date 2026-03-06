@@ -4,7 +4,7 @@
 
 export type BlendMode = "normal" | "screen" | "overlay" | "soft-light" | "color-dodge" | "multiply";
 export type SceneType = "studio" | "glass" | "night" | "clean";
-export type MotionType = "none" | "pulse" | "breathe" | "orbit" | "float" | "sequence";
+export type MotionType = "none" | "pulse" | "breathe" | "orbit" | "float" | "sequence" | "waver" | "glitch" | "rainbow";
 
 export interface GlowLayer {
   id: string;
@@ -133,13 +133,26 @@ export function exportAsCSS(state: GlowState): string {
   const layersCss = state.layers
     .filter((l) => l.active)
     .map(
-      (layer, i) => `
+      (layer, i) => {
+        let animationName = "";
+        if (state.animation.enabled) {
+          if (state.animation.type === "rainbow") {
+            animationName = `rainbow-${i} ${state.animation.duration}s linear infinite`;
+          } else if (state.animation.type !== "sequence") {
+             animationName = `${state.animation.type} ${state.animation.duration}s ease-in-out infinite`;
+             if (state.animation.type === "orbit") animationName = `orbit ${state.animation.duration}s linear infinite`;
+          }
+        }
+
+        return `
 .glow-layer-${i + 1} {
   /* ${layer.name} */
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) translate(${layer.x}px, ${layer.y}px);
+  --x: ${layer.x}px;
+  --y: ${layer.y}px;
+  transform: translate(-50%, -50%) translate(var(--x), var(--y));
   width: ${layer.width}px;
   height: ${layer.height}px;
   background-color: ${layer.color};
@@ -149,21 +162,68 @@ export function exportAsCSS(state: GlowState): string {
   mix-blend-mode: ${layer.blendMode};
   z-index: ${i};
   pointer-events: auto;
-}`,
+  ${animationName ? `animation: ${animationName};` : ""}
+}`;
+      }
     )
     .join("\n");
 
-  const animationCss = state.animation.enabled
-    ? `
+  let keyframes = "";
+  if (state.animation.enabled) {
+    if (state.animation.type === "breathe") {
+      keyframes = `
 @keyframes breathe {
-  0%, 100% { opacity: ${state.globalOpacity}; transform: scale(${state.globalScale}); }
-  50% { opacity: ${state.globalOpacity * 0.8}; transform: scale(${state.globalScale * 1.05}); }
-}
-
-.glow-container {
-  animation: breathe ${state.animation.duration}s ease-in-out infinite;
-}`
-    : "";
+  0%, 100% { opacity: 1; transform: translate(-50%, -50%) translate(var(--x, 0), var(--y, 0)) scale(1); }
+  50% { opacity: 0.8; transform: translate(-50%, -50%) translate(var(--x, 0), var(--y, 0)) scale(1.05); }
+}`;
+    } else if (state.animation.type === "pulse") {
+      keyframes = `
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}`;
+    } else if (state.animation.type === "orbit") {
+      keyframes = `
+@keyframes orbit {
+  from { transform: translate(-50%, -50%) translate(var(--x, 0), var(--y, 0)) rotate(0deg) translateX(20px) rotate(0deg); }
+  to { transform: translate(-50%, -50%) translate(var(--x, 0), var(--y, 0)) rotate(360deg) translateX(20px) rotate(-360deg); }
+}`;
+    } else if (state.animation.type === "float") {
+      keyframes = `
+@keyframes float {
+  0%, 100% { transform: translate(-50%, -50%) translate(var(--x, 0), var(--y, 0)); }
+  33% { transform: translate(-50%, -50%) translate(calc(var(--x, 0) + 20px), calc(var(--y, 0) - 20px)); }
+  66% { transform: translate(-50%, -50%) translate(calc(var(--x, 0) - 20px), calc(var(--y, 0) + 20px)); }
+}`;
+    } else if (state.animation.type === "waver") {
+      keyframes = `
+@keyframes waver {
+  0%, 100% { transform: translate(-50%, -50%) translate(var(--x, 0), var(--y, 0)) skew(0deg); }
+  25% { transform: translate(-50%, -50%) translate(calc(var(--x, 0) + 10px), var(--y, 0)) skew(2deg); }
+  75% { transform: translate(-50%, -50%) translate(calc(var(--x, 0) - 10px), var(--y, 0)) skew(-2deg); }
+}`;
+    } else if (state.animation.type === "glitch") {
+      keyframes = `
+@keyframes glitch {
+  0%, 100% { transform: translate(-50%, -50%) translate(var(--x, 0), var(--y, 0)); opacity: 1; }
+  10% { transform: translate(-50%, -50%) translate(calc(var(--x, 0) + 5px), calc(var(--y, 0) - 5px)); opacity: 0.8; }
+  20% { transform: translate(-50%, -50%) translate(calc(var(--x, 0) - 5px), calc(var(--y, 0) + 2px)); opacity: 0.9; }
+  30% { transform: translate(-50%, -50%) translate(var(--x, 0), var(--y, 0)); opacity: 1; }
+  40% { transform: translate(-50%, -50%) translate(calc(var(--x, 0) + 2px), calc(var(--y, 0) + 5px)); opacity: 0.7; }
+  50% { transform: translate(-50%, -50%) translate(calc(var(--x, 0) - 2px), calc(var(--y, 0) - 2px)); opacity: 1; }
+}`;
+    } else if (state.animation.type === "rainbow") {
+      state.layers.forEach((l, i) => {
+        keyframes += `
+@keyframes rainbow-${i} {
+  0% { background-color: ${l.color}; }
+  33% { background-color: #ff0000; }
+  66% { background-color: #00ff00; }
+  100% { background-color: #0000ff; }
+}`;
+      });
+    }
+  }
 
   return `/* Glow Effect CSS */
 .glow-container {
@@ -172,9 +232,10 @@ export function exportAsCSS(state: GlowState): string {
   height: 100%;
   transform: scale(${state.globalScale});
   opacity: ${state.globalOpacity};
-  
 }
-${animationCss}
+
+${keyframes}
+
 ${layersCss}
 ${
   state.noiseEnabled

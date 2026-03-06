@@ -267,8 +267,27 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
                       };
                     } else if (state.animation.type === "float") {
                       animationProps = {
-                        animate: { x: [0, 20, -20, 0], y: [0, -20, 20, 0] },
+                        animate: { x: [layer.x, layer.x + 20, layer.x - 20, layer.x], y: [layer.y, layer.y - 20, layer.y + 20, layer.y] },
                         transition: { duration: duration * 1.5, repeat: Infinity, ease: "easeInOut" }
+                      };
+                    } else if (state.animation.type === "waver") {
+                      animationProps = {
+                        animate: { x: [layer.x, layer.x + 10, layer.x - 10, layer.x], skew: [0, 2, -2, 0] },
+                        transition: { duration: duration * 1.2, repeat: Infinity, ease: "easeInOut" }
+                      };
+                    } else if (state.animation.type === "glitch") {
+                      animationProps = {
+                        animate: {
+                          x: [layer.x, layer.x + 5, layer.x - 5, layer.x, layer.x + 2, layer.x - 2, layer.x],
+                          y: [layer.y, layer.y - 5, layer.y + 2, layer.y, layer.y + 5, layer.y - 2, layer.y],
+                          opacity: [layer.opacity, 0.8, 0.9, layer.opacity, 0.7, 1, layer.opacity]
+                        },
+                        transition: { duration: duration / 4, repeat: Infinity, ease: "linear" }
+                      };
+                    } else if (state.animation.type === "rainbow") {
+                      animationProps = {
+                        animate: { backgroundColor: [layer.color, "#ff0000", "#00ff00", "#0000ff", layer.color] },
+                        transition: { duration: duration * 2, repeat: Infinity, ease: "linear" }
                       };
                     } else if (state.animation.type === "sequence") {
                       animationProps = {

@@ -28,13 +28,27 @@ export function exportAsTailwind(state: GlowState): string {
   const animation = state.animation.enabled
     ? `\n{/* Add to tailwind.config.ts:
   keyframes: {
-    breathe: {
-      '0%, 100%': { opacity: '${state.globalOpacity}', transform: 'scale(${state.globalScale})' },
-      '50%': { opacity: '${state.globalOpacity * 0.8}', transform: 'scale(${state.globalScale * 1.05})' },
+    ${state.animation.type}: {
+      ${state.animation.type === 'breathe' ? `'0%, 100%': { opacity: '1', transform: 'scale(1)' },
+      '50%': { opacity: '0.8', transform: 'scale(1.05)' },` :
+      state.animation.type === 'pulse' ? `'0%, 100%': { opacity: '1' },
+      '50%': { opacity: '0.5' },` :
+      state.animation.type === 'orbit' ? `'from': { transform: 'rotate(0deg) translateX(20px) rotate(0deg)' },
+      'to': { transform: 'rotate(360deg) translateX(20px) rotate(-360deg)' },` :
+      state.animation.type === 'float' ? `'0%, 100%': { transform: 'translate(0, 0)' },
+      '33%': { transform: 'translate(20px, -20px)' },
+      '66%': { transform: 'translate(-20px, 20px)' },` :
+      state.animation.type === 'waver' ? `'0%, 100%': { transform: 'translate(0, 0) skew(0deg)' },
+      '25%': { transform: 'translate(10px, 0) skew(2deg)' },
+      '75%': { transform: 'translate(-10px, 0) skew(-2deg)' },` :
+      state.animation.type === 'glitch' ? `'0%, 100%': { transform: 'translate(0, 0)', opacity: '1' },
+      '10%': { transform: 'translate(5px, -5px)', opacity: '0.8' },
+      '20%': { transform: 'translate(-5px, 2px)', opacity: '0.9' },
+      '50%': { transform: 'translate(-2px, -2px)', opacity: '1' },` : ''}
     }
   },
   animation: {
-    breathe: 'breathe ${state.animation.duration}s ease-in-out infinite',
+    ${state.animation.type}: '${state.animation.type} ${state.animation.duration}s ${state.animation.type === 'orbit' ? 'linear' : 'ease-in-out'} infinite',
   }
 */}`
     : "";
@@ -42,7 +56,7 @@ export function exportAsTailwind(state: GlowState): string {
   return `{/* Glow Effect - Tailwind + Inline Styles */}
 <div className="relative w-full h-full overflow-hidden">
   <div
-    className="absolute inset-0${state.animation.enabled ? " animate-breathe" : ""}"
+    className="absolute inset-0${state.animation.enabled ? ` animate-${state.animation.type}` : ""}"
     style={{
       transform: 'scale(${state.globalScale})',
       opacity: ${state.globalOpacity},
@@ -62,6 +76,9 @@ export function exportAsReactComponent(state: GlowState): string {
     )
     .join("\n");
 
+  const animationName = state.animation.enabled ? state.animation.type : "";
+  const animationDuration = state.animation.duration;
+
   return `import React from "react";
 
 interface GlowEffectProps {
@@ -77,11 +94,41 @@ ${layerConfigs}
 export function GlowEffect({ className = "", scale = ${state.globalScale}, opacity = ${state.globalOpacity} }: GlowEffectProps) {
   return (
     <div className={\`relative w-full h-full overflow-hidden \${className}\`}>
+      <style>{\`
+        @keyframes breathe {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+        @keyframes orbit {
+          from { transform: rotate(0deg) translateX(20px) rotate(0deg); }
+          to { transform: rotate(360deg) translateX(20px) rotate(-360deg); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translate(0, 0); }
+          33% { transform: translate(20px, -20px); }
+          66% { transform: translate(-20px, 20px); }
+        }
+        @keyframes waver {
+          0%, 100% { transform: translate(0, 0) skew(0deg); }
+          25% { transform: translate(10px, 0) skew(2deg); }
+          75% { transform: translate(-10px, 0) skew(-2deg); }
+        }
+        @keyframes glitch {
+          0%, 100% { transform: translate(0, 0); opacity: 1; }
+          10% { transform: translate(5px, -5px); opacity: 0.8; }
+          20% { transform: translate(-5px, 2px); opacity: 0.9; }
+          50% { transform: translate(-2px, -2px); opacity: 1; }
+        }
+      \`}</style>
       <div
         className="absolute inset-0"
         style={{
           transform: \`scale(\${scale})\`,
-          opacity,${state.animation.enabled ? `\n          animation: "breathe ${state.animation.duration}s ease-in-out infinite",` : ""}
+          opacity,${state.animation.enabled ? `\n          animation: "${animationName} ${animationDuration}s ${animationName === 'orbit' ? 'linear' : 'ease-in-out'} infinite",` : ""}
         }}
       >
         {layers.map((layer, i) => (
