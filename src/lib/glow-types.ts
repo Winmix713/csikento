@@ -3,6 +3,8 @@
 // ========================================================================================
 
 export type BlendMode = "normal" | "screen" | "overlay" | "soft-light" | "color-dodge" | "multiply";
+export type SceneType = "studio" | "glass" | "night" | "clean";
+export type MotionType = "none" | "pulse" | "breathe" | "orbit" | "float" | "sequence";
 
 export interface GlowLayer {
   id: string;
@@ -20,13 +22,14 @@ export interface GlowLayer {
 
 export interface AnimationConfig {
   enabled: boolean;
-  type: "pulse" | "breathe" | "none";
+  type: MotionType;
   duration: number;
 }
 
 export interface GlowState {
   power: boolean;
   themeMode: "dark" | "light";
+  sceneType: SceneType;
   globalScale: number;
   globalOpacity: number;
   noiseEnabled: boolean;
@@ -106,6 +109,7 @@ const DEFAULT_LAYERS: GlowLayer[] = [
 export const INITIAL_STATE: GlowState = {
   power: true,
   themeMode: "dark",
+  sceneType: "studio",
   globalScale: 0.9,
   globalOpacity: 1,
   noiseEnabled: true,

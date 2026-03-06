@@ -25,6 +25,31 @@ const frameDimensions = {
   desktop: { w: 820, h: 520, label: "Desktop", icon: Monitor },
 };
 
+/* ── Scene Components ── */
+function GlassScene() {
+  return (
+    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-white/10 to-transparent blur-xl opacity-20" />
+      <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[120%] h-40 bg-white/5 rounded-[100%] blur-[60px]" />
+    </div>
+  );
+}
+
+function NightScene() {
+  return (
+    <div className="absolute inset-0 pointer-events-none z-0">
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,black_100%)] opacity-60" />
+    </div>
+  );
+}
+
+function CleanScene() {
+  return (
+    <div className="absolute inset-0 pointer-events-none z-0 bg-[#f0f0f0]" />
+  );
+}
+
 export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null);
   const [showGrid, setShowGrid] = useState(false);
@@ -143,8 +168,13 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
 
       {/* Canvas area */}
       <div className="flex-1 flex items-center justify-center relative bg-[#050505] overflow-hidden group/studio">
-        {/* Subtle radial center highlight */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none" />
+        {/* Dynamic Scenes */}
+        {state.sceneType === "glass" && <GlassScene />}
+        {state.sceneType === "night" && <NightScene />}
+        {state.sceneType === "clean" && <CleanScene />}
+        {state.sceneType === "studio" && (
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03)_0%,transparent_70%)] pointer-events-none" />
+        )}
 
         {/* Rulers */}
         {showRulers && <CanvasRulers width={currentFrame.w} height={currentFrame.h} zoom={zoom} />}
@@ -214,8 +244,42 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
               }}
             >
               <AnimatePresence>
-                {state.layers.map((layer, index) =>
-                  layer.active ? (
+                {state.layers.map((layer, index) => {
+                  if (!layer.active) return null;
+
+                  let animationProps: any = {};
+                  if (state.power && state.animation.enabled) {
+                    const duration = state.animation.duration;
+                    if (state.animation.type === "breathe") {
+                      animationProps = {
+                        animate: { scale: [1, 1.05, 1], opacity: [layer.opacity, layer.opacity * 0.8, layer.opacity] },
+                        transition: { duration, repeat: Infinity, ease: "easeInOut" }
+                      };
+                    } else if (state.animation.type === "pulse") {
+                      animationProps = {
+                        animate: { opacity: [layer.opacity, layer.opacity * 0.5, layer.opacity] },
+                        transition: { duration: duration / 2, repeat: Infinity, ease: "easeInOut" }
+                      };
+                    } else if (state.animation.type === "orbit") {
+                      animationProps = {
+                        animate: { rotate: 360 },
+                        transition: { duration: duration * 2, repeat: Infinity, ease: "linear" }
+                      };
+                    } else if (state.animation.type === "float") {
+                      animationProps = {
+                        animate: { x: [0, 20, -20, 0], y: [0, -20, 20, 0] },
+                        transition: { duration: duration * 1.5, repeat: Infinity, ease: "easeInOut" }
+                      };
+                    } else if (state.animation.type === "sequence") {
+                      animationProps = {
+                        initial: { opacity: 0 },
+                        animate: { opacity: layer.opacity },
+                        transition: { delay: index * 0.2, duration: 0.5 }
+                      };
+                    }
+                  }
+
+                  return (
                     <motion.div
                       key={layer.id}
                       drag
@@ -242,6 +306,7 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
                         mixBlendMode: layer.blendMode as any,
                         zIndex: index,
                       }}
+                      {...animationProps}
                     >
                       {/* Floating Layer Context Toolbar */}
                       {state.selectedLayerId === layer.id && (
@@ -294,8 +359,8 @@ export function GlowPreview({ state, onStateChange, onLayerSelect }: PreviewProp
                         </motion.div>
                       )}
                     </motion.div>
-                  ) : null
-                )}
+                  );
+                })}
               </AnimatePresence>
             </div>
 
