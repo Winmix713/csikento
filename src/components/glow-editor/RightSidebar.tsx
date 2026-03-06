@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Settings2, Code, Palette, RefreshCcw, Copy, Check,
-  FileText, FileCode2, Sparkles, Wand2,
+  FileText, FileCode2, Sparkles, Wand2, FileImage, Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
@@ -137,6 +137,18 @@ export function ExportModal({ isOpen, onClose, state, cssOverride }: { isOpen: b
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleDownloadSVG = () => {
+    const svgStr = exportAsSVG(state);
+    const blob = new Blob([svgStr], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = `glow-export-${Date.now()}.svg`;
+    link.href = url;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("SVG downloaded!");
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -145,35 +157,59 @@ export function ExportModal({ isOpen, onClose, state, cssOverride }: { isOpen: b
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 10 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="glass-surface rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] flex flex-col shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            className="glass-surface rounded-2xl p-6 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-lg font-bold text-foreground">Export Code</h3>
-              <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors text-lg">✕</button>
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
+                  <Code className="w-4 h-4 text-primary" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground uppercase tracking-widest">Export Engine</h3>
+              </div>
+              <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors text-lg p-2 hover:bg-white/5 rounded-xl">✕</button>
             </div>
-            <div className="flex gap-1 mb-4 bg-editor-surface rounded-xl p-1 relative">
+
+            <div className="flex flex-wrap gap-2 mb-4 bg-editor-surface rounded-2xl p-1.5 relative border border-white/5">
               {([
                 { id: "css" as const, label: "CSS", icon: FileText },
                 { id: "tailwind" as const, label: "Tailwind", icon: Code },
                 { id: "react" as const, label: "React", icon: FileCode2 },
+                { id: "svg" as const, label: "SVG", icon: FileImage },
               ]).map(({ id, label, icon: Icon }) => (
                 <button key={id} onClick={() => setFormat(id)}
-                  className={cn("flex-1 py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-2 relative z-10",
+                  className={cn("flex-1 py-2 text-[11px] font-bold rounded-xl transition-all flex items-center justify-center gap-2 relative z-10",
                     format === id ? "text-foreground" : "text-muted-foreground hover:text-foreground")}>
                   <Icon className="w-3.5 h-3.5" /> {label}
                   {format === id && (
-                    <motion.div layoutId="export-tab-bg" className="absolute inset-0 bg-secondary rounded-lg shadow-sm -z-10"
+                    <motion.div layoutId="export-tab-bg" className="absolute inset-0 bg-white/5 border border-white/10 rounded-xl shadow-lg -z-10"
                       transition={{ type: "spring", stiffness: 500, damping: 35 }} />
                   )}
                 </button>
               ))}
             </div>
-            <div className="relative flex-1 bg-background rounded-xl border border-border overflow-hidden">
-              <button onClick={handleCopy} className="absolute top-3 right-3 p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-all z-10">
-                {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
+
+            <div className="relative flex-1 bg-black/40 rounded-2xl border border-white/5 overflow-hidden group">
+              <div className="absolute inset-0 bg-primary/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <button onClick={handleCopy} className="absolute top-4 right-4 p-2.5 rounded-xl bg-black/60 border border-white/10 hover:bg-primary hover:text-black transition-all z-10">
+                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </button>
-              <pre className="p-5 text-xs font-mono overflow-auto h-full max-h-[50vh] leading-relaxed">
+              <pre className="p-6 text-[11px] font-mono overflow-auto h-full max-h-[45vh] leading-relaxed text-white/70 selection:bg-primary/20 custom-scrollbar">
                 <SyntaxHighlightedCode code={code} format={format} />
               </pre>
+            </div>
+
+            <div className="mt-6 flex gap-3 pt-5 border-t border-white/5">
+              <button
+                onClick={handleDownloadSVG}
+                className="flex-1 h-11 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-[11px] font-bold text-white transition-all flex items-center justify-center gap-2"
+              >
+                <Download className="w-4 h-4 text-primary" /> Download SVG
+              </button>
+              <button
+                onClick={() => toast.info("Use the canvas toolbar for high-res PNG export")}
+                className="flex-1 h-11 bg-primary text-black rounded-2xl text-[11px] font-bold transition-all flex items-center justify-center gap-2 shadow-lg hover:bg-primary/90"
+              >
+                <FileImage className="w-4 h-4" /> Export High-Res PNG
+              </button>
             </div>
           </motion.div>
         </motion.div>

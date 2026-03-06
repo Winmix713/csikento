@@ -324,76 +324,68 @@ export function LeftSidebar({
       <div
         className="flex flex-col gap-3 border-b"
         style={{
-          padding: "16px 16px 14px",
-          background: "rgba(255,255,255,0.016)",
-          borderColor: "rgba(255,255,255,0.05)",
+          padding: "20px 16px 18px",
+          background: "rgba(255,255,255,0.01)",
+          borderColor: "rgba(255,255,255,0.04)",
         }}
       >
         {/* Row 1: Logo + Undo/Redo */}
         <div className="flex items-center justify-between">
           {/* Logo group */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             <div
-              className="relative w-8 h-8 flex items-center justify-center rounded-[14px] overflow-hidden"
+              className="relative w-9 h-9 flex items-center justify-center rounded-[16px] overflow-hidden"
               style={{ background: GLOW.primaryDim }}
             >
               {/* Inner glow blur */}
               <div
                 className="absolute inset-0 transition-colors duration-200"
-                style={{ background: GLOW.primaryDim, filter: "blur(10px)" }}
+                style={{ background: GLOW.primaryDim, filter: "blur(12px)" }}
               />
               {/* Dot */}
               <span
-                className="relative z-10 w-[13px] h-[13px] rounded-full"
+                className="relative z-10 w-[14px] h-[14px] rounded-full"
                 style={{
                   background: GLOW.primary,
-                  boxShadow: `0 0 12px rgba(168,255,80,0.65), 0 0 4px rgba(168,255,80,0.90)`,
+                  boxShadow: `0 0 14px rgba(168,255,80,0.7), 0 0 6px rgba(168,255,80,0.95)`,
                 }}
               />
             </div>
-            <div className="flex flex-col gap-0.5">
+            <div className="flex flex-col">
               <span
-                className="text-[13px] font-bold tracking-[0.07em] leading-none"
-                style={{ color: "rgba(255,255,255,0.97)" }}
+                className="text-[14px] font-bold tracking-[0.08em] leading-none uppercase"
+                style={{ color: "rgba(255,255,255,0.98)" }}
               >
                 GLOW
               </span>
               <span
-                className="font-mono text-[8px] font-medium tracking-[0.11em] uppercase leading-none"
-                style={{ color: "rgba(168,255,80,0.72)" }}
+                className="font-mono text-[8.5px] font-bold tracking-[0.14em] uppercase leading-none mt-1"
+                style={{ color: GLOW.primary, opacity: 0.8 }}
               >
-                Editor Studio
+                STUDIO
               </span>
             </div>
           </div>
 
           {/* Undo / Redo icon buttons */}
-          <div className="flex items-center gap-0.5" role="toolbar" aria-label="History">
+          <div className="flex items-center gap-1" role="toolbar" aria-label="History">
             {/* Undo */}
             <motion.button
               onClick={onUndo}
               disabled={!canUndo}
               aria-label="Undo"
-              whileTap={{ scale: 0.87 }}
+              whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              className="relative flex items-center justify-center w-8 h-8 rounded-lg border-none outline-none transition-all group"
+              className="flex items-center justify-center w-9 h-9 rounded-xl border-none outline-none transition-all"
               style={{
-                background: "transparent",
-                color: !canUndo ? "rgba(255,255,255,0.20)" : "rgba(255,255,255,0.38)",
+                background: "rgba(255,255,255,0.03)",
+                color: !canUndo ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.45)",
                 cursor: !canUndo ? "not-allowed" : "pointer",
-                opacity: !canUndo ? 0.22 : 1,
               }}
-              onMouseEnter={e => { if (canUndo) { e.currentTarget.style.color = "rgba(255,255,255,0.97)"; e.currentTarget.style.background = "rgba(255,255,255,0.052)"; } }}
-              onMouseLeave={e => { e.currentTarget.style.color = !canUndo ? "rgba(255,255,255,0.20)" : "rgba(255,255,255,0.38)"; e.currentTarget.style.background = "transparent"; }}
+              onMouseEnter={e => { if (canUndo) { e.currentTarget.style.color = "rgba(255,255,255,0.95)"; e.currentTarget.style.background = "rgba(255,255,255,0.08)"; } }}
+              onMouseLeave={e => { e.currentTarget.style.color = !canUndo ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.45)"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
             >
-              {/* Tooltip */}
-              <span
-                className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 px-2 py-1 rounded pointer-events-none whitespace-nowrap font-mono text-[9px] font-medium tracking-[0.02em] opacity-0 group-hover:opacity-100 transition-opacity z-50"
-                style={{ background: "rgba(8,8,8,0.98)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.60)", boxShadow: "0 4px 14px rgba(0,0,0,0.36)" }}
-              >
-                Undo
-              </span>
-              <Undo2 className="w-[15px] h-[15px]" strokeWidth={1.8} />
+              <Undo2 className="w-[16px] h-[16px]" strokeWidth={2.2} />
             </motion.button>
 
             {/* Redo */}
@@ -401,117 +393,60 @@ export function LeftSidebar({
               onClick={onRedo}
               disabled={!canRedo}
               aria-label="Redo"
-              whileTap={{ scale: 0.87 }}
+              whileTap={{ scale: 0.85 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              className="relative flex items-center justify-center w-8 h-8 rounded-lg border-none outline-none transition-all group"
+              className="flex items-center justify-center w-9 h-9 rounded-xl border-none outline-none transition-all"
               style={{
-                background: "transparent",
-                color: !canRedo ? "rgba(255,255,255,0.20)" : "rgba(255,255,255,0.38)",
+                background: "rgba(255,255,255,0.03)",
+                color: !canRedo ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.45)",
                 cursor: !canRedo ? "not-allowed" : "pointer",
-                opacity: !canRedo ? 0.22 : 1,
               }}
-              onMouseEnter={e => { if (canRedo) { e.currentTarget.style.color = "rgba(255,255,255,0.97)"; e.currentTarget.style.background = "rgba(255,255,255,0.052)"; } }}
-              onMouseLeave={e => { e.currentTarget.style.color = !canRedo ? "rgba(255,255,255,0.20)" : "rgba(255,255,255,0.38)"; e.currentTarget.style.background = "transparent"; }}
+              onMouseEnter={e => { if (canRedo) { e.currentTarget.style.color = "rgba(255,255,255,0.95)"; e.currentTarget.style.background = "rgba(255,255,255,0.08)"; } }}
+              onMouseLeave={e => { e.currentTarget.style.color = !canRedo ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.45)"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
             >
-              <span
-                className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 px-2 py-1 rounded pointer-events-none whitespace-nowrap font-mono text-[9px] font-medium tracking-[0.02em] opacity-0 group-hover:opacity-100 transition-opacity z-50"
-                style={{ background: "rgba(8,8,8,0.98)", border: "1px solid rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.60)", boxShadow: "0 4px 14px rgba(0,0,0,0.36)" }}
-              >
-                Redo
-              </span>
-              <Redo2 className="w-[15px] h-[15px]" strokeWidth={1.8} />
+              <Redo2 className="w-[16px] h-[16px]" strokeWidth={2.2} />
             </motion.button>
           </div>
         </div>
 
         {/* Row 2: Random (ghost, flex-1) + Export (primary lime CTA) */}
-        <div className="flex items-center gap-2">
-          {/* Random button — ghost style */}
+        <div className="flex items-center gap-2.5">
           <motion.button
             onClick={handleRandomize}
             aria-label="Randomize"
             whileTap={{ scale: 0.96 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="flex flex-1 items-center justify-center gap-[7px] h-9 px-3 rounded-2xl border outline-none transition-all"
+            className="flex flex-1 items-center justify-center gap-2 h-9 px-3 rounded-xl border-none outline-none transition-all"
             style={{
-              background: "rgba(255,255,255,0.034)",
-              borderColor: "rgba(255,255,255,0.05)",
-              color: "rgba(255,255,255,0.60)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.22)",
-              fontSize: "11px",
+              background: "rgba(255,255,255,0.04)",
+              color: "rgba(255,255,255,0.7)",
+              fontSize: "11.5px",
               fontWeight: 700,
-              letterSpacing: "0.015em",
+              letterSpacing: "0.02em",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.060)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)"; e.currentTarget.style.color = "rgba(255,255,255,0.97)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.034)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.60)"; }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
           >
-            <motion.span
-              animate={{ rotate: randomSpin ? 180 : 0 }}
-              transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
-              className="flex-shrink-0"
-            >
-              <Shuffle className="w-[14px] h-[14px]" style={{ color: GLOW.primary }} strokeWidth={2} />
-            </motion.span>
-            Random
+            <Shuffle className="w-[15px] h-[15px] text-primary" style={{ color: GLOW.primary }} />
+            <span>RANDOM</span>
           </motion.button>
 
-          {/* Export button — primary lime fill */}
           <motion.button
             onClick={handleExport}
             disabled={exportState === "loading"}
             aria-label="Export"
-            whileTap={{ scale: 0.94 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            className="relative overflow-hidden flex items-center gap-[7px] h-9 px-4 rounded-2xl border-none outline-none transition-all"
+            whileTap={{ scale: 0.96 }}
+            className="flex items-center justify-center gap-2 h-9 px-5 rounded-xl border-none outline-none transition-all shadow-xl"
             style={{
-              background: exportState === "success"
-                ? "#00C26A"
-                : exportState === "loading"
-                  ? "rgba(168,255,80,0.58)"
-                  : GLOW.primary,
-              color: exportState === "success" ? "#fff" : "#0A0A0A",
-              fontSize: "11px",
+              background: GLOW.primary,
+              color: "#0A0A0A",
+              fontSize: "11.5px",
               fontWeight: 700,
-              letterSpacing: "0.015em",
-              whiteSpace: "nowrap",
-              boxShadow: exportState === "success"
-                ? "0 4px 16px rgba(0,194,106,0.36), inset 0 1px 0 rgba(255,255,255,0.22)"
-                : `0 4px 16px ${GLOW.primaryGlow}, inset 0 1px 0 rgba(255,255,255,0.28)`,
-              opacity: exportState === "loading" ? 0.8 : 1,
-              cursor: exportState === "loading" ? "not-allowed" : "pointer",
+              letterSpacing: "0.02em",
+              boxShadow: `0 8px 24px -6px ${GLOW.primaryGlow}`,
             }}
-            onMouseEnter={e => { if (exportState === "idle") { e.currentTarget.style.background = "#bfff6a"; e.currentTarget.style.boxShadow = "0 6px 22px rgba(168,255,80,0.45), inset 0 1px 0 rgba(255,255,255,0.32)"; } }}
-            onMouseLeave={e => { if (exportState === "idle") { e.currentTarget.style.background = GLOW.primary; e.currentTarget.style.boxShadow = `0 4px 16px ${GLOW.primaryGlow}, inset 0 1px 0 rgba(255,255,255,0.28)`; } }}
           >
-            {/* Shine sweep */}
-            <motion.span
-              className="absolute top-0 left-0 w-full h-full pointer-events-none"
-              initial={{ x: "-110%", skewX: "-15deg" }}
-              whileHover={{ x: "160%" }}
-              transition={{ duration: 0.4 }}
-              style={{
-                background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.26), transparent)",
-                width: "60%",
-              }}
-            />
-
-            {exportState === "loading" ? (
-              <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.6, ease: "linear" }}>
-                <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="9" strokeDasharray="26 10" />
-                </svg>
-              </motion.span>
-            ) : exportState === "success" ? (
-              <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            ) : (
-              <Code className="w-[14px] h-[14px] flex-shrink-0" strokeWidth={2.2} />
-            )}
-
-            <span>
-              {exportState === "loading" ? "Exporting…" : exportState === "success" ? "Done" : "Export"}
-            </span>
+            <Code className="w-[15px] h-[15px]" strokeWidth={2.5} />
+            <span>EXPORT</span>
           </motion.button>
         </div>
       </div>
@@ -668,17 +603,17 @@ export function LeftSidebar({
             <select
               value={state.themeMode}
               onChange={e => updateState({ themeMode: e.target.value as "dark" | "light" })}
-              className="w-full h-9 rounded-2xl border outline-none transition-all appearance-none font-bold"
+              className="w-full h-9 rounded-xl border outline-none transition-all appearance-none font-bold"
               style={{
                 paddingLeft: 12,
                 paddingRight: 30,
-                background: "rgba(255,255,255,0.034)",
-                borderColor: "rgba(255,255,255,0.05)",
-                color: "rgba(255,255,255,0.60)",
-                fontSize: 11,
+                background: "rgba(255,255,255,0.03)",
+                borderColor: "rgba(255,255,255,0.04)",
+                color: "rgba(255,255,255,0.65)",
+                fontSize: 11.5,
                 fontWeight: 700,
                 letterSpacing: "0.01em",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.22)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
                 cursor: "pointer",
               }}
               onFocus={e => { e.currentTarget.style.borderColor = "rgba(168,255,80,0.38)"; e.currentTarget.style.color = "rgba(255,255,255,0.97)"; e.currentTarget.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 2px rgba(168,255,80,0.14)"; }}
