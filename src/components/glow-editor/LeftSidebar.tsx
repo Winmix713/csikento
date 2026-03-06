@@ -68,44 +68,78 @@ function LayerManager({ layers, selectedId, onSelect, onUpdate, onAdd, onRemove,
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] font-semibold text-editor-text-muted uppercase tracking-wider flex items-center gap-1.5">
-          <Layers className="w-3 h-3" /> Layers
-          <span className="text-[9px] font-mono text-editor-text-dim bg-editor-surface px-1.5 py-0.5 rounded">{layers.length}</span>
-        </span>
-        <motion.button onClick={onAdd} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="p-1 rounded-lg hover:bg-editor-surface-hover text-editor-text-dim hover:text-foreground transition-all">
-          <Plus className="w-3.5 h-3.5" />
+    <div className="space-y-4">
+      <div className="flex items-center justify-between px-1">
+        <div className="flex items-center gap-2">
+          <Layers className="w-4 h-4 text-white/40" />
+          <span className="text-[11px] font-black text-white/50 uppercase tracking-[0.15em]">
+            LAYERS
+          </span>
+          <span className="text-[9px] font-mono font-bold text-white/20 bg-white/[0.03] px-1.5 py-0.5 rounded-md border border-white/5">
+            {layers.length}
+          </span>
+        </div>
+        <motion.button
+          onClick={onAdd}
+          whileHover={{ scale: 1.1, color: GLOW.primary }}
+          whileTap={{ scale: 0.9 }}
+          className="p-1 rounded-lg text-white/30 transition-all"
+        >
+          <Plus className="w-5 h-5" />
         </motion.button>
       </div>
-      <div className="space-y-0.5 max-h-[220px] overflow-y-auto custom-scrollbar pr-0.5">
+      <div className="space-y-1.5">
         <AnimatePresence mode="popLayout">
           {[...layers].reverse().map((layer, di) => {
             const ri = layers.length - 1 - di;
+            const isSelected = selectedId === layer.id;
             return (
               <motion.div key={layer.id} layout
-                initial={{ opacity: 0, scale: 0.95, y: -6 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, x: -16 }}
+                initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 onClick={() => onSelect(layer.id)}
                 className={cn(
-                  "group flex items-center gap-1.5 p-2 rounded-xl text-xs cursor-pointer border transition-all",
-                  selectedId === layer.id
-                    ? "bg-secondary border-editor-border-hover text-foreground shadow-sm"
-                    : "bg-transparent border-transparent hover:bg-editor-surface hover:border-editor-border text-muted-foreground"
+                  "group flex items-center gap-3 p-2.5 rounded-[1.2rem] transition-all cursor-pointer border relative",
+                  isSelected
+                    ? "bg-white/[0.04] border-white/10 text-white shadow-lg"
+                    : "bg-transparent border-transparent hover:bg-white/[0.02] text-white/40 hover:text-white/60"
                 )}
               >
-                <motion.div className="w-0.5 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: GLOW.primary }} initial={false}
-                  animate={{ opacity: selectedId === layer.id ? 1 : 0, scaleY: selectedId === layer.id ? 1 : 0 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }} />
-                <div className="flex flex-col gap-0.5">
-                  <button onClick={(e) => moveLayer(layer.id, "up", e)} disabled={ri >= layers.length - 1} className="text-editor-text-dim hover:text-foreground disabled:opacity-15 transition-colors"><ChevronUp className="w-2.5 h-2.5" /></button>
-                  <button onClick={(e) => moveLayer(layer.id, "down", e)} disabled={ri <= 0} className="text-editor-text-dim hover:text-foreground disabled:opacity-15 transition-colors"><ChevronDown className="w-2.5 h-2.5" /></button>
+                {/* Selected Indicator Bar */}
+                {isSelected && (
+                  <motion.div
+                    layoutId="active-layer-indicator"
+                    className="absolute left-2.5 w-0.5 h-6 rounded-full bg-primary z-10"
+                    style={{ backgroundColor: GLOW.primary, boxShadow: `0 0 10px ${GLOW.primaryGlow}` }}
+                  />
+                )}
+
+                {/* Left Controls Group */}
+                <div className={cn("flex items-center gap-2", isSelected ? "pl-3" : "pl-1")}>
+                  <div className="flex flex-col gap-0.5">
+                    <button
+                      onClick={(e) => moveLayer(layer.id, "up", e)}
+                      disabled={ri >= layers.length - 1}
+                      className="text-white/15 hover:text-white/60 disabled:opacity-0 transition-colors"
+                    >
+                      <ChevronUp className="w-2.5 h-2.5" />
+                    </button>
+                    <button
+                      onClick={(e) => moveLayer(layer.id, "down", e)}
+                      disabled={ri <= 0}
+                      className="text-white/15 hover:text-white/60 disabled:opacity-0 transition-colors"
+                    >
+                      <ChevronDown className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+
+                  <button onClick={(e) => toggleVis(layer.id, e)} className="text-white/20 hover:text-white/60 transition-colors">
+                    {layer.active ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                  </button>
+
+                  <div className="w-4 h-4 rounded-full border border-white/10" style={{ backgroundColor: layer.color }} />
                 </div>
-                <button onClick={(e) => toggleVis(layer.id, e)} className="text-editor-text-dim hover:text-foreground transition-colors">
-                  {layer.active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                </button>
-                <motion.div className="w-3 h-3 rounded-full flex-shrink-0 ring-1 ring-editor-border" style={{ backgroundColor: layer.color }} layoutId={`lc-${layer.id}`} />
 
                 {editingId === layer.id ? (
                   <input
@@ -119,16 +153,19 @@ function LayerManager({ layers, selectedId, onSelect, onUpdate, onAdd, onRemove,
                   />
                 ) : (
                   <span
-                    className="flex-1 text-[11px] font-medium truncate"
+                    className={cn(
+                      "flex-1 text-[11px] font-black tracking-wide truncate",
+                      isSelected ? "text-white" : "text-white/40 group-hover:text-white/60"
+                    )}
                     onDoubleClick={(e) => startEditing(layer.id, layer.name, e)}
                   >
                     {layer.name}
                   </span>
                 )}
 
-                <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={(e) => { e.stopPropagation(); onDuplicate(layer.id); }} className="p-0.5 rounded transition-colors" style={{ color: "inherit" }} onMouseEnter={e => (e.currentTarget.style.color = GLOW.primary)} onMouseLeave={e => (e.currentTarget.style.color = "")}><CopyPlus className="w-2.5 h-2.5" /></button>
-                  <button onClick={(e) => { e.stopPropagation(); onRemove(layer.id); }} className="p-0.5 rounded hover:text-destructive text-editor-text-dim transition-colors"><Trash2 className="w-2.5 h-2.5" /></button>
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity pr-1">
+                  <button onClick={(e) => { e.stopPropagation(); onDuplicate(layer.id); }} className="p-1 hover:text-primary transition-colors text-white/20"><CopyPlus className="w-3 h-3" /></button>
+                  <button onClick={(e) => { e.stopPropagation(); onRemove(layer.id); }} className="p-1 hover:text-destructive transition-colors text-white/20"><Trash2 className="w-3 h-3" /></button>
                 </div>
               </motion.div>
             );
